@@ -1,0 +1,224 @@
+<html>
+
+	<head>
+
+		<title>JavaScript/NodeJS URL v1.0.0</title>
+
+		<!--<script type="text/javascript" src="https://raw.github.com/yeikos/js.url/master/url.js"></script>-->
+
+		<script type="text/javascript" src="../url.js"></script>
+
+		<script type="text/javascript">
+
+			var url;
+
+			console.log(
+
+				'Example 1',
+
+				URL('http://guest:secret@remote:21/filename?a=1#ok').attr()
+
+			);
+
+			/*
+
+				{
+
+					protocol: 'http:',
+					host: 'remote',
+					hostname: 'remote:21'
+					port: '21',
+					pathname: '/filename',
+					search: '',
+					hash: '',
+					username: 'guest',
+					password: 'secret'
+
+				}
+
+			*/
+
+			console.log(
+
+				'Example 2',
+
+				URL('http://www.google.com').attr('hostname')
+
+			);
+
+			// www.google.com
+
+			console.log(
+
+				'Example 3',
+
+				URL('//youtu.be').attr('protocol', 'https').attr({
+
+					pathname: '/iCkYw3cRwLo',
+					search: { t: '22s' },
+					hash: { hello : 'world' }
+
+				}).href()
+
+			);
+
+			// https://youtu.be/iCkYw3cRwLo?t=22s#hello=world
+
+			console.log(
+
+				'Example 4',
+
+				URL('http://localhost/?a=1&b[]=2').query()
+
+			);
+
+			// { a: 1, b: { 0: 2 } }
+
+			console.log(
+
+				'Example 5',
+
+				URL('http://localhost').attr('hash', 'a=1&b[]=2').queryHash()
+
+			);
+
+			// { a: 1, b: { 0: 2 } },
+
+			(url = URL().href('/folder')).location.href('http://localhost');
+
+			console.log(
+
+				'Example 6',
+
+				url.href(),
+
+				URL('//127.0.1', 'https://localhost/first/').href(),
+
+				URL('/folder', 'https://localhost/first/').href(),
+
+				URL('second', 'https://localhost/first/').href(),
+
+				URL('?a=1', 'https://localhost/first/').href(),
+
+				URL('#top', 'https://localhost/first/').href()
+
+			);
+			
+			// http://localhost/folder https://127.0.1/ https://localhost/folder https://localhost/first/second https://localhost/first/?a=1 https://localhost/first/#top 
+
+			console.log(
+
+				'Example 7',
+
+				URL.param({
+
+					a: 1,
+
+					b: ['x', 'y', 'z'],
+
+					c: {
+
+						d: {
+
+							e: 'ok'
+
+						}
+
+					}
+
+				})
+
+			);
+
+			// a=1&b[][0]=x&b[][1]=y&b[][2]=z&b[c][d][e]=ok
+
+			console.log(
+
+				'Example 8',
+
+				URL.unparam('a=1&b[0]=x&b[1]=y&b[2]=z&c[d][e]=ok')
+
+			);
+
+			/*
+
+				{
+
+					a: 1,
+
+					b: {
+
+						0: 'x',
+						1: 'y',
+						2: 'z'
+
+					},
+
+					c: {
+
+						d: {
+
+							e: 'ok'
+
+						}
+
+					}
+
+				}
+
+			*/
+
+			console.log(
+
+				'Example 9',
+
+				URL.unbuild('http://localhost/index.html?id=12#top')
+
+			);
+
+			/*
+
+				{
+
+					protocol: 'http:',
+					host: 'localhost',
+					hostname: 'localhost'
+					port: '',
+					pathname: '/index.html',
+					search: '?id=12',
+					hash: '#top',
+					username: '',
+					password: ''
+
+				}
+
+			*/
+
+			console.log(
+
+				'Example 10',
+
+				URL.build({
+
+					protocol: 'http',
+					hostname: '127.0.0.1',
+					pathname: '/folder/image.jpg',
+
+					search: { a: 1 },
+
+					hash: 'test'
+
+				})
+
+			);
+
+			// http://127.0.0.1/folder/image.jpg?a=1
+
+
+		</script>
+
+	</head>
+
+	<body>See the console log.</body>
+
+</html>

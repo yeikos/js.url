@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>JavaScript/NodeJS URL v1.0.0</title>
+
+        <link rel="stylesheet" href="qunit.css" />
+        <script src="qunit.js"></script>
+
+        <!--<script type="text/javascript" src="https://raw.github.com/yeikos/js.url/master/url.js"></script>-->
+        
+        <script src="../url.js"></script>
+
+        <script>
+
+            test('URL.toString', function() {
+
+                strictEqual( URL.toString(), '' );
+                strictEqual( URL.toString('str'), 'str' );
+                strictEqual( URL.toString(2), '2' );
+                strictEqual( URL.toString(null), '' );
+                strictEqual( URL.toString(undefined), '' );
+                strictEqual( URL.toString({}), '' );
+                strictEqual( URL.toString([]), '' );
+                strictEqual( URL.toString(function() {}), '' );
+
+            });
+
+            test('URL.param', function() {
+
+                strictEqual( URL.param(), '' );
+
+                strictEqual(
+
+                    URL.param({
+
+                        'spaces are replaced by +': '1 + 1 = 2',
+
+                        '=!$[.]': {
+
+                            '[special characters are scaped]=>': '++$'
+
+                        },
+
+                        'object': {
+
+                            0: 'x',
+                            1: 'y',
+                            2: 'z',
+
+                            'array': ['i', 'j', 'k']
+
+                        },
+
+                        a: {
+
+                            b: {
+
+                                c: null,
+                                d: undefined,
+                                e: 1,
+                                f: function() {},
+                                g: [],
+                                h: {}
+
+                            }
+
+                        }
+
+                    }), 
+
+                    'spaces+are+replaced+by+%2B=1+%2B+1+%3D+2&%3D!%24%5B.%5D[%5Bspecial+characters+are+scaped%5D%3D%3E]=%2B%2B%24&' +
+                    'object[0]=x&object[1]=y&object[2]=z&object[array][0]=i&object[array][1]=j&object[array][2]=k&a[b][c]&a[b][d]&a[b][e]=1&a[b][f]&a[b][g]&a[b][h]'
+
+                );
+
+            });
+
+            test('URL.unparam', function() {
+
+                deepEqual( URL.unparam(), {} );
+
+                deepEqual(
+
+                    URL.unparam(
+
+                        'spaces+are+replaced+by+%2B=1+%2B+1+%3D+2&%3D!%24%5B.%5D[%5Bspecial+characters+are+scaped%5D%3D%3E]=%2B%2B%24&' +
+                        'object[0]=x&object[1]=y&object[2]=z&object[array][0]=i&object[array][1]=j&object[array][2]=k&a[b][c]&a[b][d]&a[b][e]=1&a[b][f]&a[b][g]&a[b][h]'
+
+                    ), 
+
+                    {
+
+                        'spaces are replaced by +': '1 + 1 = 2',
+
+                        '=!$[.]': {
+
+                            '[special characters are scaped]=>': '++$'
+
+                        },
+
+                        'object': {
+
+                            0: 'x',
+                            1: 'y',
+                            2: 'z',
+
+                            'array': {
+
+                                0: 'i',
+                                1: 'j',
+                                2: 'k'
+
+                            }
+
+                        },
+
+                        a: {
+
+                            b: {
+
+                                c: '',
+                                d: '',
+                                e: '1',
+                                f: '',
+                                g: '',
+                                h: ''
+
+                            }
+
+                        }
+
+                    }
+
+                );
+
+            });
+
+            test('URL.getElementURL', function() {
+
+                var url = 'address',
+                    element;
+
+                (element = document.createElement('form')).setAttribute('action', url);
+
+                strictEqual(URL.getElementURL(element), url);
+
+                (element = document.createElement('a')).setAttribute('href', url);
+
+                strictEqual(URL.getElementURL(element), url);
+
+                (element = document.createElement('link')).setAttribute('href', url);
+
+                strictEqual(URL.getElementURL(element), url);
+
+                (element = document.createElement('base')).setAttribute('href', url);
+
+                strictEqual(URL.getElementURL(element), url);
+
+                (element = document.createElement('img')).setAttribute('src', '');
+
+                strictEqual(URL.getElementURL(element), '');
+
+                (element = document.createElement('script')).setAttribute('src', url);
+
+                strictEqual(URL.getElementURL(element), url);
+
+                (element = document.createElement('iframe')).setAttribute('src', url);
+
+                strictEqual(URL.getElementURL(element), url);
+
+                (element = document.createElement('span')).setAttribute('src', url);
+
+                strictEqual(URL.getElementURL(element), '');
+
+            });
+
+            test('URL.normalize.protocol', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.protocol(), '' );
+
+                strictEqual( normalize.protocol('http:'), 'http:' );
+
+                strictEqual( normalize.protocol('PROTOcol+-1.'), 'protocol+-1.:' );
+
+                strictEqual( normalize.protocol('1protocol'), '' );
+
+                strictEqual( normalize.protocol('in%45valid'), '' );
+
+            });
+
+            test('URL.normalize.auth', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.auth(), '' );
+
+                strictEqual( normalize.auth('user:password'), 'user:password' );
+
+                strictEqual( normalize.auth('user'), 'user' );
+
+                strictEqual( normalize.auth('test1-._~!$&\'()*+,;=:%32%45'), 'test1-._~!$&\'()*+,;=:%32%45');
+
+                strictEqual( normalize.auth('in>valid'), '' );
+
+            });
+
+            test('URL.normalize.host', function() {
+
+                var normalize = URL.normalize;
+
+                deepEqual( normalize.host(), {
+
+                    hostname: '',
+                    port: ''
+
+                });
+
+                deepEqual( normalize.host('127.0.0.1'), {
+
+                    hostname: '127.0.0.1',
+                    port: ''
+
+                });
+
+                deepEqual( normalize.host('localhost'), {
+
+                    hostname: 'localhost',
+                    port: ''
+
+                });
+
+                deepEqual( normalize.host('[FE80::0202:B3FF:FE1E:8329]:80'), {
+
+                    hostname: '[FE80::0202:B3FF:FE1E:8329]',
+                    port: '80'
+
+                });
+
+                deepEqual( normalize.host('invalid<:21'), {
+
+                    hostname: '',
+                    port: ''
+
+                });
+
+                deepEqual( normalize.host(':21'), {
+
+                    hostname: '',
+                    port: ''
+
+                });
+
+            });
+    
+            test('URL.normalize.hostname', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.hostname(), '');
+
+                strictEqual( normalize.hostname('127.0.0.1'), '127.0.0.1');
+
+                strictEqual( normalize.hostname('localhost'), 'localhost');
+
+                strictEqual( normalize.hostname('[FE80::0202:B3FF:FE1E:8329]'), '[FE80::0202:B3FF:FE1E:8329]');
+
+                strictEqual( normalize.hostname('invalid<'), '');
+
+            });
+
+            test('URL.normalize.port', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.port(), '');
+
+                strictEqual( normalize.port(80), '80');
+
+                strictEqual( normalize.port('21'), '21');
+
+                strictEqual( normalize.port('1024a'), '');
+
+                strictEqual( normalize.port('<'), '');
+
+            });
+
+            test('URL.normalize.pathname', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.pathname(), '/');
+
+                strictEqual( normalize.pathname('a'), '/a');
+
+                strictEqual( normalize.pathname('a//b/////c/'), '/a/b/c/');
+
+                strictEqual( normalize.pathname('/a/%41%32/<'), '/a/A2/%3C');
+
+                strictEqual( normalize.pathname('/a%'), '/');
+
+            });
+
+            test('URL.normalize.search', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.search(), '');
+
+                strictEqual( normalize.search('a'), '?a');
+
+                strictEqual( normalize.search({ a: 1 }), '?a=1');
+
+                strictEqual( normalize.search({ a: 1, b: { c: 1 } }), '?a=1&b[c]=1');
+
+                strictEqual( normalize.search('a%'), '');
+
+            });
+
+            test('URL.normalize.hash', function() {
+
+                var normalize = URL.normalize;
+
+                strictEqual( normalize.hash(), '');
+
+                strictEqual( normalize.hash('a'), '#a');
+
+                strictEqual( normalize.hash({ a: 1 }), '#a=1');
+
+                strictEqual( normalize.hash({ a: 1, b: { c: 1 } }), '#a=1&b[c]=1');
+
+                strictEqual( normalize.hash('a%'), '');
+
+            });
+
+            test('URL.unbuild', function() {
+
+                var attr = {
+
+                    protocol: 'protocol:',
+                    auth: 'auth',
+                    host: 'hostname:80',
+                    hostname: 'hostname',
+                    port: '80',
+                    pathname: '/pathname',
+                    search: '?search',
+                    hash: '#hash'
+
+                };
+
+                deepEqual(
+
+                    URL.unbuild('protocol://auth@hostname:80/pathname?search#hash'), attr
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild(attr), attr
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('second#top', 'https://localhost/first/'), {
+
+                        protocol: 'https:',
+                        auth: '',
+                        host: 'localhost',
+                        hostname: 'localhost',
+                        port: '',
+                        pathname: '/first/second',
+                        search: '',
+                        hash: '#top'
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('second?a=1', 'https://localhost/first'), {
+
+                        protocol: 'https:',
+                        auth: '',
+                        host: 'localhost',
+                        hostname: 'localhost',
+                        port: '',
+                        pathname: '/second',
+                        search: '?a=1',
+                        hash: ''
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('//address', 'ftp://localhost/first?a=1#top'), {
+
+                        protocol: 'ftp:',
+                        auth: '',
+                        host: 'address',
+                        hostname: 'address',
+                        port: '',
+                        pathname: '/',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('last', '/first/'), {
+
+                        protocol: '',
+                        auth: '',
+                        host: '',
+                        hostname: '',
+                        port: '',
+                        pathname: '/first/last',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+            });
+
+            test('URL.build', function() {
+
+                strictEqual(
+
+                    URL.build({
+
+                        protocol: 'protocol:',
+                        auth: 'auth',
+                        host: 'hostname:80',
+                        hostname: 'hostname',
+                        port: '80',
+                        pathname: '/pathname',
+                        search: '?search',
+                        hash: '#hash'
+
+                    }), 
+
+                    'protocol://auth@hostname:80/pathname?search#hash'
+
+                );
+
+                strictEqual(
+
+                    URL.build('second#top', 'https://localhost/first/'), 
+
+                    'https://localhost/first/second#top'
+
+                );
+
+                strictEqual(
+
+                    URL.build('second?a=1', 'https://localhost/first'),
+
+                    'https://localhost/second?a=1'
+
+                );
+
+                strictEqual(
+
+                    URL.build('//address', 'ftp://localhost/first?a=1#top'),
+
+                    'ftp://address'
+
+                );
+
+                strictEqual(
+
+                    URL.build('last', '/first/'),
+
+                    '/first/last'
+
+                );
+
+            }); 
+
+            test('URL.prototype.constructor', function() {
+
+                strictEqual(
+
+                    URL() instanceof URL,
+
+                    true
+
+                );
+
+            });
+
+            test('URL.prototype.attr', function() {
+
+                var input = 'https://user:password@localhost:80/folder/filename?a=1&b=2#top',
+
+                    url = URL(input);
+
+                deepEqual( url.attr(), {
+
+                    auth: 'user:password',
+                    hash: '#top',
+                    host: 'localhost:80',
+                    hostname: 'localhost',
+                    pathname: '/folder/filename',
+                    port: '80',
+                    protocol: 'https:',
+                    search: '?a=1&b=2'
+
+                });
+
+                url.attr().hostname = 'changed';
+
+                strictEqual( url.attr('hostname'), 'localhost' );
+
+                strictEqual( url.attr({ hostname: '127.0.0.1' }).attr('Hostname'), '127.0.0.1' );
+
+                strictEqual( url.attr({ auth: null }).attr('auth'), '' );
+
+                strictEqual( url.attr('protocol', 'http').attr('protocol'), 'http:' );
+
+                strictEqual( url.attr('invalid-attr', 'value').attr('invalid-attr'), '' );
+
+                strictEqual( url.attr('protocol', 'invalid-value!').attr('protocol'), '' );
+
+                strictEqual( URL().attr('protocol', 'http').attr('protocol'), 'http:' );
+
+                strictEqual( URL().attr('port', 8080).attr('port'), '8080' );
+
+                strictEqual( URL(input).attr({ auth: null }).attr('auth'), '' );
+
+                deepEqual( URL(input).attr(), {
+
+                    auth: 'user:password',
+                    hash: '#top',
+                    host: 'localhost:80',
+                    hostname: 'localhost',
+                    pathname: '/folder/filename',
+                    port: '80',
+                    protocol: 'https:',
+                    search: '?a=1&b=2'
+
+                });
+
+            });
+
+
+            test('URL.prototype.location', function() {
+
+                var url = URL();
+
+                strictEqual(
+
+                    url.location instanceof URL, true
+
+                );
+
+                url.location.href('/first/');
+
+                strictEqual(
+
+                    url.href('second').href(), '/first/second'
+
+                );
+
+                url.location.href('https://localhost');
+
+                strictEqual(
+
+                    url.href('//127.0.0.1').href(), 'https://127.0.0.1'
+
+                );
+
+                url.location.href('?a=1#top');
+
+                strictEqual(
+
+                    url.href('#x').href(), '/?a=1#x'
+            
+                );
+
+                delete url.location;
+
+                strictEqual(
+
+                    url.href('folder').href(), '/folder'
+            
+                );
+
+            });
+
+           test('URL.prototype.href', function() {
+
+                var input = 'https://user:password@localhost:80/folder/filename?a=1&b=2#top',
+                    url;
+
+                strictEqual( URL().href(), '' );
+
+                strictEqual( URL(input).href(), input );
+
+                strictEqual( URL('folder////path///test').href(), '/folder/path/test' );
+
+                strictEqual( URL({ hostname: 'localhost' }).href(), '//localhost' );
+
+            });
+
+            test('URL.prototype.query', function() {
+
+                var url = URL().attr('search', 'a=1');
+
+                deepEqual( url.query(), { a : '1' });
+
+                strictEqual( url.query('a'), '1');
+
+                strictEqual( url.query('b'), undefined);
+
+                strictEqual( url.query('b', 2).attr('search'), '?a=1&b=2');
+
+                strictEqual( url.query('a', null).attr('search'), '?b=2');
+
+                strictEqual( url.query({ c: 3 }).attr('search'), '?c=3');
+
+            });
+
+            test('URL.prototype.queryHash', function() {
+
+                var url = URL().attr('hash', 'a=1');
+
+                deepEqual( url.queryHash(), { a : '1' });
+
+                strictEqual( url.queryHash('a'), '1');
+
+                strictEqual( url.queryHash('b'), undefined);
+
+                strictEqual( url.queryHash('b', 2).attr('hash'), '#a=1&b=2');
+
+                strictEqual( url.queryHash('a', null).attr('hash'), '#b=2');
+
+                strictEqual( url.queryHash({ c: 3 }).attr('hash'), '#c=3');
+
+            });
+
+        </script>
+
+    </head>
+
+    <body>
+
+        <div id="qunit"></div>
+
+    </body>
+
+</html>

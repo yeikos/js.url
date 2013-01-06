@@ -1,0 +1,45 @@
+<html>
+
+	<head>
+
+		<title>JavaScript/NodeJS URL v1.0.0</title>
+
+		<!--<script type="text/javascript" src="https://raw.github.com/yeikos/js.url/master/url.js"></script>-->
+
+		<script type="text/javascript" src="../url.js"></script>
+
+		<script type="text/javascript">
+
+			var url = URL('http://guest:secret@remote:21/filename?a=1#ok');
+
+			console.log(
+
+				url.attr()
+
+			);
+
+			console.log(
+
+				url.attr('hostname')
+
+			);
+
+			console.log(
+
+				url.query('b', 2).query()
+
+			);
+
+			console.log(
+
+				url.attr('protocol', 'https').href()
+
+			);
+
+		</script>
+
+	</head>
+
+	<body>See the console log.</body>
+
+</html>
