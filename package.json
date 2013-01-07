@@ -1,7 +1,7 @@
 {
 	
 	"name": "kurl",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"author": "yeikos",
 	"description": "It's an javascript class that parses an URL and convert it into a object with similar properties to object Location (window.location). Also included inverse process (object to URL string), and a lot of features that it will help you to modify a URL easily.",
 	"homepage": "https://github.com/yeikos/js.url",

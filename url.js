@@ -1,5 +1,5 @@
 /*!
- * @title JavaScript/NodeJS URL v1.0.0
+ * @name JavaScript/NodeJS URL v1.0.1
  * @autor yeikos
  
  * Copyright 2013 - https://github.com/yeikos/js.url
@@ -83,7 +83,7 @@
 
 					// Extraemos su URL
 
-					input = this.href(Public.getElementURL(input));
+					input = Public.getElementURL(input);
 
 				// Deconstruimos la URL y guardamos su información en forma de objeto
 
