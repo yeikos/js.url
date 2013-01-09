@@ -293,7 +293,7 @@
 
                 var normalize = URL.normalize;
 
-                strictEqual( normalize.pathname(), '/');
+                strictEqual( normalize.pathname(), '');
 
                 strictEqual( normalize.pathname('a'), '/a');
 
@@ -301,7 +301,7 @@
 
                 strictEqual( normalize.pathname('/a/%41%32/<'), '/a/A2/%3C');
 
-                strictEqual( normalize.pathname('/a%'), '/');
+                strictEqual( normalize.pathname('/a%'), '');
 
             });
 
@@ -350,7 +350,15 @@
                     search: '?search',
                     hash: '#hash'
 
-                };
+                }, element = document.createElement('a');
+
+                element.setAttribute('href', 'protocol://auth@hostname:80/pathname?search#hash');
+
+                deepEqual(
+
+                    URL.unbuild(element), attr
+
+                );
 
                 deepEqual(
 
@@ -407,7 +415,7 @@
                         host: 'address',
                         hostname: 'address',
                         port: '',
-                        pathname: '/',
+                        pathname: '',
                         search: '',
                         hash: ''
 
@@ -586,7 +594,7 @@
 
                 strictEqual(
 
-                    url.href('#x').href(), '/?a=1#x'
+                    url.href('#x').href(), '?a=1#x'
             
                 );
 
@@ -615,39 +623,160 @@
 
             });
 
-            test('URL.prototype.query', function() {
+            test('URL.prototype.search', function() {
 
                 var url = URL().attr('search', 'a=1');
 
-                deepEqual( url.query(), { a : '1' });
+                deepEqual( url.search(), { a : '1' } );
 
-                strictEqual( url.query('a'), '1');
+                strictEqual( url.search('a'), '1' );
 
-                strictEqual( url.query('b'), undefined);
+                strictEqual( url.search('b'), undefined );
 
-                strictEqual( url.query('b', 2).attr('search'), '?a=1&b=2');
+                strictEqual( url.search('b', 2).attr('search'), '?a=1&b=2' );
 
-                strictEqual( url.query('a', null).attr('search'), '?b=2');
+                strictEqual( url.search('a', null).attr('search'), '?b=2' );
 
-                strictEqual( url.query({ c: 3 }).attr('search'), '?c=3');
+                strictEqual( url.search({ c: 3 }).attr('search'), '?c=3' );
 
             });
 
-            test('URL.prototype.queryHash', function() {
+            test('URL.prototype.hash', function() {
 
                 var url = URL().attr('hash', 'a=1');
 
-                deepEqual( url.queryHash(), { a : '1' });
+                deepEqual( url.hash(), { a : '1' } );
 
-                strictEqual( url.queryHash('a'), '1');
+                strictEqual( url.hash('a'), '1' );
 
-                strictEqual( url.queryHash('b'), undefined);
+                strictEqual( url.hash('b'), undefined );
 
-                strictEqual( url.queryHash('b', 2).attr('hash'), '#a=1&b=2');
+                strictEqual( url.hash('b', 2).attr('hash'), '#a=1&b=2' );
 
-                strictEqual( url.queryHash('a', null).attr('hash'), '#b=2');
+                strictEqual( url.hash('a', null).attr('hash'), '#b=2' );
 
-                strictEqual( url.queryHash({ c: 3 }).attr('hash'), '#c=3');
+                strictEqual( url.hash({ c: 3 }).attr('hash'), '#c=3' );
+
+            });
+
+            test('URL.prototype.isExternal', function() {
+
+                strictEqual( URL('http://localhost', 'http://localhost').isExternal(), false );
+
+                strictEqual( URL('//localhost', 'http://localhost').isExternal(), false );
+
+                strictEqual( URL('/folder', 'http://localhost').isExternal(), false );
+
+                strictEqual( URL('?a=1', 'http://localhost').isExternal(), false );
+
+                strictEqual( URL('#top', 'http://localhost').isExternal(), false );
+
+                strictEqual( URL('http://localhost').isExternal(), true );
+
+                strictEqual( URL('/folder').isExternal(), false );
+
+                strictEqual( URL('?a=1', '/folder').isExternal(), false );
+
+                strictEqual( URL('https://localhost', 'http://localhost').isExternal(), true );
+
+                strictEqual( URL('http://127.0.0.1', 'http://localhost').isExternal(), true );
+
+                strictEqual( URL('//127.0.0.1', 'http://localhost').isExternal(), true );
+
+                strictEqual( URL('http://localhost', '//localhost').isExternal(), true );
+
+                strictEqual( URL('http://localhost', '/folder').isExternal(), true );
+
+                var url = URL('http://localhost/filename');
+
+                delete url.location;
+
+                strictEqual( url.isExternal(), true );
+
+                strictEqual( url.attr('protocol', null).isExternal(), true );
+
+                strictEqual( url.attr('host', null).isExternal(), false );
+
+                strictEqual( url.href('').isExternal(), false );
+
+            });
+
+           test('URL.prototype.select', function() {
+
+                var input = 'http://guest@localhost:80/filename.html?a=1#top',
+                    url = URL(input);
+
+                strictEqual( url.select.apply(url, URL.attributes), input );
+
+                strictEqual( url.select('protocol'), 'http://' );
+
+                strictEqual( url.select('auth'), '' );
+
+                strictEqual( url.select('protocol', 'auth'), 'http://' );
+
+                strictEqual( url.select('protocol', 'hostname', 'auth'), 'http://guest@localhost' );
+
+                strictEqual( url.select('host', 'search'), '//localhost:80/?a=1' );
+
+                strictEqual( url.select('protocol', 'pathname', 'hash'), 'http:///filename.html#top' );
+
+                strictEqual( url.select('port', 'pathname'), '/filename.html' );
+
+                strictEqual( url.select('hash'), '#top' );
+                
+                strictEqual( url.select(), '' );
+
+                strictEqual( url.select('not-exists'), '' );
+
+            });
+
+            test('URL.prototype.to', function() {
+
+                var input = 'http://localhost:80/filename.html?a=1#top',
+                    url = URL(input);
+
+                strictEqual( url.to('protocol'), 'http://' );
+
+                strictEqual( url.to('host'), 'http://localhost:80' );
+
+                strictEqual( url.to('hostname'), 'http://localhost' );
+
+                strictEqual( url.to('port'), 'http://localhost:80' );
+
+                strictEqual( url.to('pathname'), 'http://localhost:80/filename.html' );
+
+                strictEqual( url.to('search'), 'http://localhost:80/filename.html?a=1' );
+                
+                strictEqual( url.to('hash'), input );
+
+                strictEqual( url.to('not-exists'), input );
+
+                strictEqual( url.to(), input );
+
+            });
+
+            test('URL.prototype.from', function() {
+
+                var input = 'http://localhost:80/filename.html?a=1#top',
+                    url = URL(input);
+
+                strictEqual( url.from('protocol'), input);
+
+                strictEqual( url.from('host'), '//localhost:80/filename.html?a=1#top' );
+
+                strictEqual( url.from('hostname'), '//localhost/filename.html?a=1#top' );
+
+                strictEqual( url.from('port'), '/filename.html?a=1#top' );
+
+                strictEqual( url.from('pathname'), '/filename.html?a=1#top' );
+
+                strictEqual( url.from('search'), '?a=1#top' );
+                
+                strictEqual( url.from('hash'), '#top' );
+
+                strictEqual( url.from('not-exists'), input );
+
+                strictEqual( url.from(), input );
 
             });
 

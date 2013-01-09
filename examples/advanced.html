@@ -25,14 +25,13 @@
 				{
 
 					protocol: 'http:',
+					auth: 'guest:secret',
 					host: 'remote',
 					hostname: 'remote:21'
 					port: '21',
 					pathname: '/filename',
 					search: '',
-					hash: '',
-					username: 'guest',
-					password: 'secret'
+					hash: ''
 
 				}
 
@@ -68,7 +67,7 @@
 
 				'Example 4',
 
-				URL('http://localhost/?a=1&b[]=2').query()
+				URL('http://localhost/?a=1&b[]=2').search()
 
 			);
 
@@ -78,7 +77,7 @@
 
 				'Example 5',
 
-				URL('http://localhost').attr('hash', 'a=1&b[]=2').queryHash()
+				URL('http://localhost').attr('hash', 'a=1&b[]=2').hash()
 
 			);
 
@@ -104,7 +103,7 @@
 
 			);
 			
-			// http://localhost/folder https://127.0.1/ https://localhost/folder https://localhost/first/second https://localhost/first/?a=1 https://localhost/first/#top 
+			// http://localhost/folder https://127.0.1 https://localhost/folder https://localhost/first/second https://localhost/first/?a=1 https://localhost/first/#top
 
 			console.log(
 
@@ -181,15 +180,14 @@
 				{
 
 					protocol: 'http:',
+					auth: '',
 					host: 'localhost',
 					hostname: 'localhost'
 					port: '',
 					pathname: '/index.html',
 					search: '?id=12',
-					hash: '#top',
-					username: '',
-					password: ''
-
+					hash: '#top'
+			
 				}
 
 			*/
@@ -203,16 +201,14 @@
 					protocol: 'http',
 					hostname: '127.0.0.1',
 					pathname: '/folder/image.jpg',
-
 					search: { a: 1 },
-
 					hash: 'test'
 
 				})
 
 			);
 
-			// http://127.0.0.1/folder/image.jpg?a=1
+			// http://127.0.0.1/folder/image.jpg?a=1#test
 
 
 		</script>

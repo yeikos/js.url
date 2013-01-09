@@ -26,13 +26,19 @@
 
 			console.log(
 
-				url.query('b', 2).query()
+				url.search('b', 2).search()
 
 			);
 
 			console.log(
 
 				url.attr('protocol', 'https').href()
+
+			);
+
+			console.log(
+
+				URL('subsection/?b=1', 'http://localhost/section/').href()
 
 			);
 

@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.0.1
+JavaScript/NodeJS URL v1.1.0
 ==================================================
 
 What is this?
@@ -17,6 +17,21 @@ More info
 --------------------------------------
 
 http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
+
+Changelog
+--------------------------------------
+
+**v1.1.0 - 09/01/13**
+
+- Added to prototype: `isExternal`, `select`, `from`, `to`.
+
+- Renamed prototype methods: `query` to `search` and `queryHash` to `hash`.
+
+- URL argument now can be a DOM element.
+
+- Code more clean and lightweight.
+
+- Fix bug and optimizations.
 
 Example
 --------------------------------------
@@ -49,7 +64,7 @@ Example
 
 				console.log(
 
-					url.query('b', 2).query() 
+					url.search('b', 2).search() 
 
 					// { a : 1, b : 2 }
 
@@ -87,25 +102,25 @@ API methods
 
 **URL()**
 
-> Create a new instance.
+> Creates a new instance.
 
 returns instance.
 
 **URL(url)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
-> Create a new instance with an URL defined.
+> Creates a new instance with an URL defined.
 
 returns instance.
 
 **URL(url, location)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
-_location: string or attributes object._
+_location: string, attributes object or DOM element._
 
-> Create a new instance with an URL defined in base to the location introduced.
+> Creates a new instance with an URL defined in base to the location introduced.
 
 returns instance.
 
@@ -123,15 +138,15 @@ returns instance.
 
 **url.href()**
 
-> Build an URL string in base to current attributes values.
+> Builds an URL string in base to current attributes values.
 
 returns URL string.
 
 **url.href(url)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
-> Set a new URL that replaces all attributes.
+> Sets a new URL that replaces all attributes.
 
 returns instance.
 
@@ -139,7 +154,7 @@ returns instance.
 
 **url.attr()**
 
-> Get all attributes.
+> Gets all attributes.
 
 returns attributes object.
 
@@ -147,7 +162,7 @@ returns attributes object.
 
 _name: attribute name (string)._
 
-> Get value of the attribute.
+> Gets value of the attribute.
 
 returns string.
 
@@ -155,7 +170,7 @@ returns string.
 
 _object: attributes object._
 
-> Set multiple values to the attributes.
+> Sets multiple values to the attributes.
 
 returns instance.
 
@@ -165,77 +180,115 @@ _name: attribute name (string)._
 
 _value: attribute value._
 
-> Set a new value to the attribute.
+> Sets a new value to the attribute.
 
 returns instance.
 
 ***
 
-**url.query()**
+**url.search()**
 
-> Get search attribute in object format.
+> Gets search attribute in object format.
 
 returns object.
 
-**url.query(name)**
+**url.search(name)**
 
 _name: attribute name (string)._
 
-> Get the value of component.
+> Gets the value of component.
 
 returns string.
 
-**url.query(object)**
+**url.search(object)**
 
 _object: compontents object._
 
-> Replace all compontents by the object introduced.
+> Replaces all compontents by the object introduced.
 
 returns instance.
 
-**url.query(name, value)**
+**url.search(name, value)**
 
 _name: compontent name (string)._
 
 _value: compontent value. If it's `null` the compontent will be delete._
 
-> Set a new value to the compontent.
+> Sets a new value to the compontent.
 
 returns instance.
 
 ***
 
-**url.hashQuery()**
+**url.hash()**
 
-> Get hash attribute in object format.
+> Gets hash attribute in object format.
 
 returns object.
 
-**url.hashQuery(name)**
+**url.hash(name)**
 
 _name: attribute name (string)._
 
-> Get the value of component.
+> Gets the value of component.
 
 returns string.
 
-**url.hashQuery(object)**
+**url.hash(object)**
 
 _object: compontents object._
 
-> Replace all compontents by the object introduced.
+> Replaces all components by the object introduced.
 
 returns instance.
 
-**url.hashQuery(name, value)**
+**url.hash(name, value)**
 
 _name: compontent name (string)._
 
 _value: compontent value. If it's `null` the compontent will be delete._
 
-> Set a new value to the compontent.
+> Sets a new value to the compontent.
 
 returns instance.
+
+***
+
+**url.isExternal()**
+
+> Checks if the address is external in base to the location.
+
+returns true or false (boolean).
+
+***
+
+**url.select(name, name, ...)**
+
+_name: attributes names (string)._
+
+> Builds an URL string in base to current attributes values selected.
+
+returns URL (string).
+
+***
+
+**url.from(name)**
+
+_name: attribute name (string)._
+
+> Builds an URL string in base to current attributes values, starting from the attribute selected.
+
+returns URL (string).
+
+***
+
+**url.to(name)**
+
+_name: attribute name (string)._
+
+> Builds an URL string in base to current attributes values, starting from the beginning to the attribute selected.
+
+returns URL (string).
 
 ***
 
@@ -247,7 +300,7 @@ returns instance.
 
 _element: element object (DOM Element)._
 
-> Get element URL (form, a, base, link, img, script, iframe).
+> Gets element URL (form, a, base, link, img, script, iframe).
 
 returns URL if found or empty string if not found (string).
 
@@ -255,19 +308,19 @@ returns URL if found or empty string if not found (string).
 
 **URL.build(url)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
-> Build a new URL based in attributes introduced.
+> Builds a new URL based in attributes introduced.
 
 returns URL (string).
 
 **URL.build(url, location)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
-_location: string or attributes object._
+_location: string, attributes object or DOM element._
 
-> Build a new URL based in attributes introduced and doing use location attributes.
+> Builds a new URL based in attributes introduced and doing use location attributes.
 
 returns URL (string).
 
@@ -275,7 +328,7 @@ returns URL (string).
 
 **URL.unbuild(url)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
 > Unbuilds URL to converting it into a attributes object.
 
@@ -283,9 +336,9 @@ returns attributes object.
 
 **URL.unbuild(url, location)**
 
-_url: string or attributes object._
+_url: string, attributes object or DOM element._
 
-_location: string or attributes object._
+_location: string, attributes object or DOM element._
 
 > Unbuilds URL to converting it into a attributes object and doing use location attributes.
 
@@ -297,7 +350,7 @@ returns attributes object.
 
 _query: query object._
 
-> Convert a object into query string.
+> Converts a object into query string.
 
 returns query string.
 
@@ -307,7 +360,7 @@ returns query string.
 
 _query: query string._
 
-> Convert a query string into object.
+> Converts a query string into object.
 
 returns query object.
 

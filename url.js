@@ -1,5 +1,5 @@
 /*!
- * @name JavaScript/NodeJS URL v1.0.1
+ * @name JavaScript/NodeJS URL v1.1.0
  * @autor yeikos
  
  * Copyright 2013 - https://github.com/yeikos/js.url
@@ -77,14 +77,6 @@
 
 			} else if ((temp = typeof input) === 'string' || (input && temp === 'object')) {
 
-				// Si es un elemento HTML
-
-				if (typeof HTMLElement === 'function' && input instanceof HTMLElement)
-
-					// Extraemos su URL
-
-					input = Public.getElementURL(input);
-
 				// Deconstruimos la URL y guardamos su información en forma de objeto
 
 				this._attributes = Public.unbuild(input, (this.location instanceof Public) ? this.location._attributes : false);
@@ -95,7 +87,7 @@
 
 		},
 
-		// Atributos
+		// Establece/Obtiene valores de atributos
 
 		attr: function(name, value) {
 
@@ -194,121 +186,67 @@
 
 		// Opera con el atributo `search` en forma de objeto
 
-		query: function(name, value) {
+		search: function() {
 
-			var size = arguments.length,
-
-				query = Public.unparam(this.attr('search').substr(1));
-
-			if (!size) { // query()
-
-				// Devolvemos el atributo `search` en forma de objeto
-
-				return query;
-
-			} else if (size === 1) {
-
-				// Si es un objeto
-
-				if (name && typeof name === 'object') { // query({})
-
-					// Reemplazamos el atributo `search` entero
-
-					this.attr('search', name);
-
-				} else { // query('name')
-
-					// De lo contrario devolvemos el valor del atributo solicidado
-
-					return query[name];
-
-				}
-
-			} else if (size === 2) {
-
-				// Si el valor es `null`
-
-				if (value === null) { // query('name', null)
-
-					// Eliminamos el valor
-
-					delete query[name];
-
-				} else { // query('name', 'value')
-
-					// De lo contrario establecemos el nuevo valor
-
-					query[name] = value;
-
-				}
-
-				// Actualizamos el atributo `search`
-
-				this.attr('search', query);
-
-			}
-
-			return this;
+			return _prototypeQuery.apply(this, ['search'].concat([].slice.apply(arguments)));
 
 		},
 
 		// Opera con el atributo `hash` en forma de objeto
 
-		queryHash: function(name, value) {
+		hash: function() {
 
-			var size = arguments.length,
+			return _prototypeQuery.apply(this, ['hash'].concat([].slice.apply(arguments)));
 
-				query = Public.unparam(this.attr('hash').substr(1));
+		},
 
-			if (!size) { // queryHash()
+		// Comprueba si la URL es externa
 
-				// Devolvemos el atributo `hash` en forma de objeto
+		isExternal: function() {
 
-				return query;
+			// Comprobamos si se encuentra definida la localización
 
-			} else if (size === 1) {
+			var location = (this.location instanceof Public) ? this.location._attributes : false,
 
-				// Si es un objeto
+			// Construimos los atributos en base a la localización
 
-				if (name && typeof name === 'object') { // queryHash({})
+				attr = Public.unbuild(this._attributes, location);
 
-					// Reemplazamos el atributo `hash` entero
+			// Si no se encuentra disponible la instancia localización
 
-					this.attr('hash', name);
+			if (!location)
 
-				} else { // queryHash('name')
+				// La dirección será externa si tiene definido el atributo `protocol` o `host`
 
-					// De lo contrario devolvemos el valor del atributo solicidado
+				return (attr.protocol || attr.host) ? true : false;
 
-					return query[name];
+			// La URL será externa si `protocol` o `host` no coincide con el de localización
 
-				}
+			return (this.location.attr('protocol') !== attr.protocol || this.location.attr('host') !== attr.host);
 
-			} else if (size === 2) {
+		},
 
-				// Si el valor es `null`
+		// Construye la URL con los atributos seleccionados
 
-				if (value === null) { // queryHash('name', null)
+		select: function() {
 
-					// Eliminamos el valor
+			return _prototypeSelect.apply(this, [arguments]);
 
-					delete query[name];
+		},
 
-				} else { // queryHash('name', 'value')
+		// Construye la URL empezando por el atributo introducido
 
-					// De lo contrario establecemos el nuevo valor
+		from: function(input) {
 
-					query[name] = value;
+			return _prototypeSelect.apply(this, [Public.attributes.slice(0).reverse(), input]);
 
-				}
+		},
 
-				// Actualizamos el atributo `hash`
+		// Construye la URL empezando desde el principio hasta el atributo introducido
 
-				this.attr('hash', query);
+		to: function(input) {
 
-			}
-
-			return this;
+			return _prototypeSelect.apply(this, [Public.attributes, input]);
 
 		}
 
@@ -332,11 +270,15 @@
 		// Validación de las diversas partes de una URL en base al estandar RFC3986
 
 		regex_rfc3986_schema: /^[a-z][\w+\-.]*$/i,
-		regex_rfc3986_userinfo: /^(?:[A-Za-z0-9\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*$/,
-		regex_rfc3986_host: /^(?:\[(?:(?:(?:(?:[0-9A-Fa-f]{1,4}:){6}|::(?:[0-9A-Fa-f]{1,4}:){5}|(?:[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,1}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){3}|(?:(?:[0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){2}|(?:(?:[0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}:|(?:(?:[0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})?::)(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(?:(?:[0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})?::)|[Vv][0-9A-Fa-f]+\.[A-Za-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:[A-Za-z0-9\-._~!$&'()*+,;=]|%[0-9A-Fa-f]{2})*)$/,
+		regex_rfc3986_userinfo: /^(?:[\w\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*$/,
+		regex_rfc3986_host: /^(?:\[(?:(?:(?:(?:[0-9A-Fa-f]{1,4}:){6}|::(?:[0-9A-Fa-f]{1,4}:){5}|(?:[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,1}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){3}|(?:(?:[0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})?::(?:[0-9A-Fa-f]{1,4}:){2}|(?:(?:[0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}:|(?:(?:[0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})?::)(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(?:(?:[0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})?::[0-9A-Fa-f]{1,4}|(?:(?:[0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})?::)|[Vv][0-9A-Fa-f]+\.[\w\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|(?:[\w\-._~!$&'()*+,;=]|%[0-9A-Fa-f]{2})*)$/,
 		regex_rfc3986_port: /^\d+$/,
-		regex_rfc3986_path: /^(?:(?:\/(?:[A-Za-z0-9\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|\/(?:(?:[A-Za-z0-9\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)?|(?:[A-Za-z0-9\-._~!$&'()*+,;=@]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|(?:[A-Za-z0-9\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:\/(?:[A-Za-z0-9\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|)$/,
-		regex_rfc3986_query: /^(?:[\w\-._~!$&'()*+,;=:@\/?]|%[0-9A-Fa-f]{2})*$/,
+
+		// La validación del atributo `pathname` y `query` es innecesaria, ya que la función encodeURI se encarga de normalizarla
+
+		// regex_rfc3986_path: /^(?:(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|\/(?:(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)?|(?:[\w\-._~!$&'()*+,;=@]|%[0-9A-Fa-f]{2})+(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|)$/,
+		
+		// regex_rfc3986_query: /^(?:[\w\-._~!$&'()*+,;=:@\/?]|%[0-9A-Fa-f]{2})*$/,
 
 		// Normalización de los atributos de una URL
 
@@ -431,13 +373,11 @@
 
 			}
 
-			// Comprobamos si la entrada es correcta, si no lo es su valor será una cadena vacía
+			// Si la entrada no se encuentra vacía y no comienza con una barra
 
-			var test = Public.normalize.regex_rfc3986_path.test(input) ? input : '';
+			if (input && input.substr(0, 1) !== '/')
 
-			// Finalmente la entrada comenzará siempre con `/`
-
-			input = test ? ((input.substr(0, 1) !== '/') ? ('/' + input) : input) : '/';
+				input = '/' + input;
 
 			// Simplificamos posibles repeticiones seguidas del carácter `/`
 
@@ -447,73 +387,14 @@
 
 		search: function(input) {
 
-			// Si la entrada es un objecto
+			return _normalizeQuery.apply(this, ['search', input]);
 
-			if (input && typeof input === 'object') {
-
-				// Convertimos la entrada al formato literal `query`
-
-				input = Public.param(input);
-
-			} else {
-
-				// De lo contrario forzamos a que sea literal y nos deshacemos del primer carácter si es `?`
-
-				input = ((input = Public.toString(input)) && input.substr(0, 1) === '?') ? input.substr(1) : input;
-
-			}
-
-			// Decodificamos y volvemos a codificar caracteres especiales en la entrada de forma segura
-
-			try {
-
-				input = encodeURI(decodeURI(input));
-
-			} catch (e) {
-
-				input = '';
-
-			}
-
-			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
-
-			return (input && Public.normalize.regex_rfc3986_query.test(input)) ? ('?' + decodeURI(input)) : '';
 
 		},
 
 		hash: function(input) {
 
-			// Si la entrada es un objecto
-
-			if (input && typeof input === 'object') {
-
-				// Convertimos la entrada al formato literal `query`
-
-				input = Public.param(input);
-
-			} else {
-
-				// De lo contrario forzamos a que sea literal y nos deshacemos del primer carácter si es `#`
-
-				input = ((input = Public.toString(input)) && input.substr(0, 1) === '#') ? input.substr(1) : input;
-
-			}
-
-			// Decodificamos y volvemos a codificar caracteres especiales en la entrada de forma segura
-
-			try {
-
-				input = encodeURI(decodeURI(input));
-
-			} catch (e) {
-
-				input = '';
-
-			}
-
-			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
-
-			return (input && Public.normalize.regex_rfc3986_query.test(input)) ? ('#' + decodeURI(input)) : '';
+			return _normalizeQuery.apply(this, ['hash', input]);
 
 		}
 
@@ -533,7 +414,7 @@
 
 		var temp;
 
-		return (!(temp = (input instanceof HTMLFormElement) ? 'action' : (
+		return (_isElement(input) && (temp = (input instanceof HTMLFormElement) ? 'action' : (
 
 			((input instanceof HTMLAnchorElement) || (input instanceof HTMLBaseElement) || (input instanceof HTMLLinkElement)) ? 'href' : (
 
@@ -541,7 +422,7 @@
 
 			)
 
-		))) ? '' : input.getAttribute(temp);
+		))) ? input.getAttribute(temp) : '';
 
 	};
 
@@ -553,9 +434,18 @@
 
 		return (attr.protocol ? (attr.protocol + '//') : (attr.host ? '//' : '')) + (
 
-			(attr.auth) ? (attr.auth + '@') : ''
+			// Es necesario el atributo `host` para añadir el atributo `auth`
 
-		) + attr.host + ((attr.pathname.length === 1 && !attr.search && !attr.hash) ? '' : (attr.pathname + attr.search + attr.hash));
+			(attr.auth && attr.host) ? (attr.auth + '@') : ''
+
+		) + attr.host +
+
+		// Si el atributo `pathname` se encuentra vacío, se trata de una dirección y le acompaña el atributo `search` o `hash`
+		// debemos definir el atributo `pathname` como `/` para no corromper la estructura de la URL
+
+		((!attr.pathname && (attr.protocol || attr.host) && (attr.search || attr.hash)) ? '/' : '') +
+
+		(attr.pathname + attr.search + attr.hash);
 
 	};
 
@@ -568,6 +458,14 @@
 		// Si la localización está definida como una cadena literal o un objecto lo convertimos a un objecto de atributos normalizados
 
 		location = (location && ((temp = typeof location) === 'string' || temp === 'object')) ?  Public.unbuild(location) : false;
+
+		// Si es un elemento HTML
+
+		if (_isElement(input))
+
+			// Extraemos su dirección
+
+			input = Public.getElementURL(input);
 
 		// Si la entrada es una cadena de texo
 
@@ -946,6 +844,179 @@
 		return result;
 
 	};
+
+	// Funciones privadas utilizadas para no repetir código
+
+	function _prototypeQuery(type, name, value) {
+
+		var size = arguments.length-1,
+
+			query = Public.unparam(this.attr(type).substr(1));
+
+		if (!size) { // query()
+
+			// Devolvemos el atributo en forma de objeto
+
+			return query;
+
+		} else if (size === 1) {
+
+			// Si es un objeto
+
+			if (name && typeof name === 'object') { // query({})
+
+				// Reemplazamos el atributo entero
+
+				this.attr(type, name);
+
+			} else { // query('name')
+
+				// De lo contrario devolvemos el valor del atributo solicidado
+
+				return query[name];
+
+			}
+
+		} else if (size === 2) {
+
+			// Si el valor es `null`
+
+			if (value === null) { // query('name', null)
+
+				// Eliminamos el valor
+
+				delete query[name];
+
+			} else { // query('name', 'value')
+
+				// De lo contrario establecemos el nuevo valor
+
+				query[name] = value;
+
+			}
+
+			// Actualizamos el atributo
+
+			this.attr(type, query);
+
+		}
+
+		return this;
+
+	}
+
+	function _prototypeSelect(attributes, name) {
+
+		// Obtenemos los atributos actuales
+
+		var attr = this.attr(),
+
+		// Contenedor de atributos
+
+			result = {},
+
+		// Marcador
+
+			ready = false,
+
+		// Itineración
+
+			index = 0,
+
+			item;
+
+		// Convertimos el nombre a cadena de texto
+
+		name = Public.toString(name).toLowerCase();
+
+		// Si el límite se encuentra en el atributo `hostname`
+
+		if (name === 'hostname') {
+
+			// Eliminamos el puerto y el atributo `host` que también contiene el puerto
+
+			delete attr.host;
+			delete attr.port;
+
+		}
+
+		// Recorremos los atributos seleccionados
+
+		for (index, size = attributes.length; index < size; ++index) {
+
+			// Nombre del atributo
+
+			item = attributes[index];
+
+			// Si el marcador se encuentra desactivado
+
+			if (!ready) {
+
+				// Guardamos el atributo
+
+				if (item in attr)
+
+					result[item] = attr[item];
+
+				// Si ha llegado a la posición límite
+
+				if (item === name)
+
+					// Activamos el marcador para que deje de guardar
+
+					ready = true;
+
+			}
+
+		}
+
+		// Devolvemos la URL construida con los atributos seleccionados
+
+		return Public.build(result, (this.location instanceof Public) ? this.location._attributes : false);
+
+	}
+
+	function _normalizeQuery(type, input) {
+
+		var str = (type === 'hash') ? '#' : '?';
+
+		// Si la entrada es un objecto
+
+		if (input && typeof input === 'object') {
+
+			// Convertimos la entrada al formato literal `query`
+
+			input = Public.param(input);
+
+		} else {
+
+			// De lo contrario forzamos a que sea literal y nos deshacemos del primer carácter si es el buscado
+
+			input = ((input = Public.toString(input)) && input.substr(0, 1) === str) ? input.substr(1) : input;
+
+		}
+
+		// Decodificamos y volvemos a codificar caracteres especiales en la entrada de forma segura
+
+		try {
+
+			input = encodeURI(decodeURI(input));
+
+		} catch (e) {
+
+			input = '';
+
+		}
+
+		return input ? (str + decodeURI(input)) : '';
+
+	}
+
+	function _isElement(input) {
+
+		return (typeof HTMLElement === 'function' && input instanceof HTMLElement);
+
+	}
 
 	// Acceso público a la clase (navegador y NodeJS)
 
