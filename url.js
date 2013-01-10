@@ -1,7 +1,7 @@
 /*!
- * @name JavaScript/NodeJS URL v1.1.0
+ * @name JavaScript/NodeJS URL v1.2.0
  * @autor yeikos
- 
+
  * Copyright 2013 - https://github.com/yeikos/js.url
  * GNU General Public License
  * http://www.gnu.org/licenses/gpl-3.0.txt
@@ -231,6 +231,57 @@
 		select: function() {
 
 			return _prototypeSelect.apply(this, [arguments]);
+
+		},
+
+		// Construye la URL sin los atributos seleccionados
+
+		unselect: function() {
+
+			var attr = Public.attributes.slice(0),
+				argv = [].slice.apply(arguments),
+				buffer = {},
+				x = argv.length,
+				y = attr.length;
+
+			// Convertimos la matriz de argumentos a objeto
+
+			while (x--)
+
+				buffer[Public.toString(argv[x]).toLowerCase()] = 1;
+
+			// Si se desea eliminar el atributo `hostname` o `port`
+
+			if (buffer.hostname || buffer.port) {
+
+				// Eliminamos el atributo `host`, ya que contiene a ambos
+
+				buffer.host = 1;
+
+			// Si se desea eliminar el atributo `host`
+
+			} else if (buffer.host) {
+
+				// Eliminamos el atributo `hostname` y `port`, ya que contiene a ambos
+
+				buffer.hostname = 1;
+				buffer.port = 1;
+
+			}
+
+			// Recorremos los atributos
+
+			while (y--)
+
+				// Si se encuentra en la lista
+
+				if (buffer[attr[y]])
+
+					// Lo eliminamos
+
+					attr.splice(y, 1);
+
+			return _prototypeSelect.apply(this, [attr]);
 
 		},
 

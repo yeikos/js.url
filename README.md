@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.1.0
+JavaScript/NodeJS URL v1.2.0
 ==================================================
 
 What is this?
@@ -20,6 +20,10 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 
 Changelog
 --------------------------------------
+
+**v1.2.0 - 10/01/13**
+
+- Added to prototype: `unselect`.
 
 **v1.1.0 - 09/01/13**
 
@@ -267,6 +271,16 @@ returns true or false (boolean).
 _name: attributes names (string)._
 
 > Builds an URL string in base to current attributes values selected.
+
+returns URL (string).
+
+***
+
+**url.unselect(name, name, ...)**
+
+_name: attributes names (string)._
+
+> Builds an URL string excluding the attributes values selected.
 
 returns URL (string).
 

@@ -730,6 +730,35 @@
 
             });
 
+           test('URL.prototype.unselect', function() {
+
+                var input = 'http://guest@localhost:80/filename.html?a=1#top',
+                    url = URL(input);
+
+                strictEqual( url.unselect.apply(url, URL.attributes), '' );
+
+                strictEqual( url.unselect('protocol'), '//guest@localhost:80/filename.html?a=1#top' );
+
+                strictEqual( url.unselect('auth'), 'http://localhost:80/filename.html?a=1#top' );
+
+                strictEqual( url.unselect('protocol', 'auth'), '//localhost:80/filename.html?a=1#top' );
+
+                strictEqual( url.unselect('protocol', 'hostname', 'auth'), '/filename.html?a=1#top' );
+
+                strictEqual( url.unselect('host', 'search'), 'http:///filename.html#top' );
+
+                strictEqual( url.unselect('protocol', 'pathname', 'hash'), '//guest@localhost:80/?a=1' );
+
+                strictEqual( url.unselect('port', 'pathname'), 'http://guest@localhost/?a=1#top' );
+
+                strictEqual( url.unselect('hash'), 'http://guest@localhost:80/filename.html?a=1' );
+                
+                strictEqual( url.unselect(), input );
+
+                strictEqual( url.unselect('not-exists'), input );
+
+            });
+
             test('URL.prototype.to', function() {
 
                 var input = 'http://localhost:80/filename.html?a=1#top',
