@@ -14,31 +14,80 @@
 
 			console.log(
 
-				url.attr()
+				url.attr() 
+
+				/*{ 
+
+					protocol: 'http:',
+					auth: 'guest:secret',
+					host: 'remote:21',
+					hostname: 'remote',
+					port: 21,
+					pathname: '/filename',
+					search: '?a=1',
+					hash: '#ok'
+
+				}*/
 
 			);
 
 			console.log(
 
-				url.attr('hostname')
+				url.attr('hostname') 
+
+				// remote
 
 			);
 
 			console.log(
 
-				url.search('b', 2).search()
+				url.attr('hostname', 'localhost').href()
+
+				// http://guest:secret@localhost:21/filename?a=1#ok
 
 			);
 
 			console.log(
 
-				url.attr('protocol', 'https').href()
+				url.attr('search'),
+
+				// ?a=1
+
+				url.search('b', 2).search(),
+
+				// { a : 1, b : 2 }
+
+				url.attr('search')
+
+				// ?a=1&b=2
 
 			);
 
 			console.log(
 
-				URL('subsection/?b=1', 'http://localhost/section/').href()
+				url.hash({ a: 1 }).select('hostname', 'pathname', 'hash')
+
+				// //localhost/filename#a=1
+
+			);
+
+			console.log(
+
+				URL('http://localhost', 'https://localhost').isExternal(),
+
+				// true
+
+				URL('/folder', 'https://localhost').isExternal()
+
+				// false
+
+			);
+
+			console.log(
+
+				URL('subsection?a=1', 'http://localhost/section/').from('pathname')
+
+				// /section/subsection?a=1
 
 			);
 

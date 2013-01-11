@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.2.0
+JavaScript/NodeJS URL v1.2.1
 ==================================================
 
 What is this?
@@ -21,6 +21,13 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 Changelog
 --------------------------------------
 
+**v1.2.1 - 11/01/13**
+
+- Added to prototype: `instance`.
+- Constructor improved.
+- Bug fix in `_prototypeSelect`: `select`, `unselect`, `from`, `to`.
+- Bug fix in URL.normalize.host: it will be converted to lowercase.
+
 **v1.2.0 - 10/01/13**
 
 - Added to prototype: `unselect`.
@@ -35,7 +42,7 @@ Changelog
 
 - Code more clean and lightweight.
 
-- Fix bug and optimizations.
+- Bug fix and optimizations.
 
 Example
 --------------------------------------
@@ -54,7 +61,18 @@ Example
 
 					url.attr() 
 
-					// { protocol: 'http:', auth: 'guest:secret', host: 'remote:21', hostname: 'remote', ... }
+					/*{ 
+
+						protocol: 'http:',
+						auth: 'guest:secret',
+						host: 'remote:21',
+						hostname: 'remote',
+						port: 21,
+						pathname: '/filename',
+						search: '?a=1',
+						hash: '#ok'
+
+					}*/
 
 				);
 
@@ -68,17 +86,53 @@ Example
 
 				console.log(
 
-					url.search('b', 2).search() 
+					url.attr('hostname', 'localhost').href()
 
-					// { a : 1, b : 2 }
+					// http://guest:secret@localhost:21/filename?a=1#ok
 
 				);
 
 				console.log(
 
-					url.attr('protocol', 'https').href() 
+					url.attr('search'),
 
-					// https://guest:secret@remote:21/filename?a=1#ok
+					// ?a=1
+
+					url.search('b', 2).search(),
+
+					// { a : 1, b : 2 }
+
+					url.attr('search')
+
+					// ?a=1&b=2
+
+				);
+
+				console.log(
+
+					url.hash({ a: 1 }).select('hostname', 'pathname', 'hash')
+
+					// //localhost/filename#a=1
+
+				);
+
+				console.log(
+
+					URL('http://localhost', 'https://localhost').isExternal(),
+
+					// true
+
+					URL('/folder', 'https://localhost').isExternal()
+
+					// false
+
+				);
+
+				console.log(
+
+					URL('subsection?a=1', 'http://localhost/section/').from('pathname')
+
+					// /section/subsection?a=1
 
 				);
 
@@ -104,27 +158,13 @@ API methods
 
 ***
 
-**URL()**
-
-> Creates a new instance.
-
-returns instance.
-
-**URL(url)**
-
-_url: string, attributes object or DOM element._
-
-> Creates a new instance with an URL defined.
-
-returns instance.
-
 **URL(url, location)**
 
-_url: string, attributes object or DOM element._
+_url: string, attributes object or DOM element (optional)._
 
-_location: string, attributes object or DOM element._
+_location: string, attributes object or DOM element (optional)._
 
-> Creates a new instance with an URL defined in base to the location introduced.
+> Creates a new instance with an URL in base to the location introduced.
 
 returns instance.
 
@@ -270,7 +310,7 @@ returns true or false (boolean).
 
 _name: attributes names (string)._
 
-> Builds an URL string in base to current attributes values selected.
+> Builds an URL string using only selected attributes.
 
 returns URL (string).
 
@@ -280,7 +320,7 @@ returns URL (string).
 
 _name: attributes names (string)._
 
-> Builds an URL string excluding the attributes values selected.
+> Builds an URL string excluding selected attributes.
 
 returns URL (string).
 
@@ -290,7 +330,7 @@ returns URL (string).
 
 _name: attribute name (string)._
 
-> Builds an URL string in base to current attributes values, starting from the attribute selected.
+> Builds an URL string starting from the selected attribute.
 
 returns URL (string).
 
@@ -300,13 +340,24 @@ returns URL (string).
 
 _name: attribute name (string)._
 
-> Builds an URL string in base to current attributes values, starting from the beginning to the attribute selected.
+> Builds an URL string starting from the beginning to the selected attribute.
 
 returns URL (string).
 
 ***
 
 ### Global methods (URL)
+
+***
+
+**URL.instance(argv, callback)**
+
+_argv: array argument of the constructor (optional)._
+_callback: function whose context is the new instance (optional)._
+
+> Create a new URL instance with arguments, calling first to callback and finally to constructor.
+
+returns instance.
 
 ***
 
@@ -320,19 +371,11 @@ returns URL if found or empty string if not found (string).
 
 ***
 
-**URL.build(url)**
-
-_url: string, attributes object or DOM element._
-
-> Builds a new URL based in attributes introduced.
-
-returns URL (string).
-
 **URL.build(url, location)**
 
 _url: string, attributes object or DOM element._
 
-_location: string, attributes object or DOM element._
+_location: string, attributes object or DOM element (optional)._
 
 > Builds a new URL based in attributes introduced and doing use location attributes.
 
@@ -340,19 +383,11 @@ returns URL (string).
 
 ***
 
-**URL.unbuild(url)**
-
-_url: string, attributes object or DOM element._
-
-> Unbuilds URL to converting it into a attributes object.
-
-returns attributes object.
-
 **URL.unbuild(url, location)**
 
 _url: string, attributes object or DOM element._
 
-_location: string, attributes object or DOM element._
+_location: string, attributes object or DOM element (optional)._
 
 > Unbuilds URL to converting it into a attributes object and doing use location attributes.
 

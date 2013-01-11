@@ -1,5 +1,5 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.0
+ * @name JavaScript/NodeJS URL v1.2.1
  * @autor yeikos
 
  * Copyright 2013 - https://github.com/yeikos/js.url
@@ -11,36 +11,38 @@
 
 	var Public = function URL(url, location) {
 
-		// Si la instancia no ha sido creada, creamos una nueva
+		// Si la instancia no ha sido creada
 
-		var self = (this instanceof URL) ? this : new Public(false);
+		if (!(this instanceof Public))
+
+			// Devolvemos una instancia
+
+			return Public.instance(arguments);
 
 		// Inicializamos el objeto contenedor de atributos
 
-		self._attributes = {};
+		this._attributes = {};
 
-		// Si el único argumento recibido es `false` no operamos sobre la instancia
+		// Si la instancia sobre la que nos encontramos no es `location`
 
-		if (arguments.length === 1 && url === false)
+		if (!this.isLocation)
 
-			return self;
-		
-		// Definimos la instancia `location`
+			// Creamos la instancia `location`con un marcador para evitar repetir código
 
-		self.location = new Public(false);
+			this.location = Public.instance((arguments.length > 1)  ? [location] : [], function() {
 
-		// Establecemos la URL
+				this.isLocation = true;
 
-		if (location !== undefined)
+			});
 
-			self.location.href(location);
+		// Establecemos la dirección
 
-		if (url !== undefined)
+		if (arguments.length)
 
-			self.href(url);
+			this.href(url);
 
-		return self;
-	
+		return this;
+
 	}, publicName = 'URL';
 
 	Public.prototype = {
@@ -398,7 +400,7 @@
 
 			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
 
-			return Public.normalize.regex_rfc3986_host.test(input = Public.toString(input)) ? input : '';
+			return Public.normalize.regex_rfc3986_host.test(input = Public.toString(input).toLowerCase()) ? input : '';
 			
 		},
 
@@ -448,6 +450,26 @@
 			return _normalizeQuery.apply(this, ['hash', input]);
 
 		}
+
+	};
+
+	// Crea una nueva instancia con la posibilidad de interactuar con ella antes de llamar a su constructor original
+
+	Public.instance = function(argv, callback) {
+
+		var Foo = function URL(callback) {
+
+			if (typeof callback === 'function')
+
+				callback.call(this);
+
+		};
+
+		return (Foo.prototype = Public.prototype).constructor.apply(
+
+			new Foo(callback), argv
+
+		);
 
 	};
 
@@ -960,7 +982,7 @@
 
 		// Obtenemos los atributos actuales
 
-		var attr = this.attr(),
+		var attr = Public.unbuild(this._attributes, (this.location instanceof Public) ? this.location._attributes : false),
 
 		// Contenedor de atributos
 
@@ -1023,7 +1045,7 @@
 
 		// Devolvemos la URL construida con los atributos seleccionados
 
-		return Public.build(result, (this.location instanceof Public) ? this.location._attributes : false);
+		return Public.build(result);
 
 	}
 
