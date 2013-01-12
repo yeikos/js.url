@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.2.1
+JavaScript/NodeJS URL v1.2.2
 ==================================================
 
 What is this?
@@ -20,6 +20,10 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 
 Changelog
 --------------------------------------
+
+**v1.2.2 - 12/01/13**
+
+- Bug fix in `_prototypeSelect`: variable `size` was not declared.
 
 **v1.2.1 - 11/01/13**
 

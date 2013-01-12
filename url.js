@@ -1,5 +1,5 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.1
+ * @name JavaScript/NodeJS URL v1.2.2
  * @autor yeikos
 
  * Copyright 2013 - https://github.com/yeikos/js.url
@@ -996,6 +996,8 @@
 
 			index = 0,
 
+			size = attributes.length,
+
 			item;
 
 		// Convertimos el nombre a cadena de texto
@@ -1015,7 +1017,7 @@
 
 		// Recorremos los atributos seleccionados
 
-		for (index, size = attributes.length; index < size; ++index) {
+		for (index; index < size; ++index) {
 
 			// Nombre del atributo
 
