@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.2.2
+JavaScript/NodeJS URL v1.2.3
 ==================================================
 
 What is this?
@@ -21,6 +21,12 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 Changelog
 --------------------------------------
 
+**v1.2.3 - 15/01/13**
+
+- Bug fix in `URL.normalize.pathname`: absolute path is converted to canonical.
+- Location argument now can be a URL instance.
+- Code more clean and lightweight.
+
 **v1.2.2 - 12/01/13**
 
 - Bug fix in `_prototypeSelect`: variable `size` was not declared.
@@ -30,7 +36,7 @@ Changelog
 - Added to prototype: `instance`.
 - Constructor improved.
 - Bug fix in `_prototypeSelect`: `select`, `unselect`, `from`, `to`.
-- Bug fix in URL.normalize.host: it will be converted to lowercase.
+- Bug fix in `URL.normalize.host`: it will be converted to lowercase.
 
 **v1.2.0 - 10/01/13**
 
@@ -39,13 +45,9 @@ Changelog
 **v1.1.0 - 09/01/13**
 
 - Added to prototype: `isExternal`, `select`, `from`, `to`.
-
 - Renamed prototype methods: `query` to `search` and `queryHash` to `hash`.
-
 - URL argument now can be a DOM element.
-
 - Code more clean and lightweight.
-
 - Bug fix and optimizations.
 
 Example
@@ -166,7 +168,7 @@ API methods
 
 _url: string, attributes object or DOM element (optional)._
 
-_location: string, attributes object or DOM element (optional)._
+_location: string, attributes object, DOM element or URL instance (optional)._
 
 > Creates a new instance with an URL in base to the location introduced.
 
@@ -379,7 +381,7 @@ returns URL if found or empty string if not found (string).
 
 _url: string, attributes object or DOM element._
 
-_location: string, attributes object or DOM element (optional)._
+_location: string, attributes object, DOM element or URL instance (optional)._
 
 > Builds a new URL based in attributes introduced and doing use location attributes.
 
@@ -391,7 +393,7 @@ returns URL (string).
 
 _url: string, attributes object or DOM element._
 
-_location: string, attributes object or DOM element (optional)._
+_location: string, attributes object, DOM element or URL instance (optional)._
 
 > Unbuilds URL to converting it into a attributes object and doing use location attributes.
 

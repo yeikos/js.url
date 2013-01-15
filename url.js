@@ -1,5 +1,5 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.2
+ * @name JavaScript/NodeJS URL v1.2.3
  * @autor yeikos
 
  * Copyright 2013 - https://github.com/yeikos/js.url
@@ -65,7 +65,7 @@
 
 				// Construimos la URL con los atributos y la devolvemos como cadena de texto
 
-				return Public.build(this._attributes, (this.location instanceof Public) ? this.location._attributes : false);
+				return Public.build(this._attributes, this.location);
 
 			// Si el parámetro es `null`
 
@@ -81,7 +81,7 @@
 
 				// Deconstruimos la URL y guardamos su información en forma de objeto
 
-				this._attributes = Public.unbuild(input, (this.location instanceof Public) ? this.location._attributes : false);
+				this._attributes = Public.unbuild(input, this.location);
 
 			}
 
@@ -105,7 +105,7 @@
 
 				for (temp in this._attributes)
 
-					buffer[temp] = Public.toString(this._attributes[temp]);
+					buffer[temp] = _toString(this._attributes[temp]);
 
 				return buffer;
 
@@ -119,7 +119,7 @@
 
 					// Devolvemos el valor del atributo en formato literal
 
-					return Public.toString(this._attributes[name.toLowerCase()]);
+					return _toString(this._attributes[name.toLowerCase()]);
 
 				// Si es un objeto
 
@@ -158,7 +158,7 @@
 
 							temp = Public.normalize.host(
 
-								Public.toString(value) + (
+								_toString(value) + (
 
 									(name === 'hostname' && this._attributes.port) ? (':' + this._attributes.port) : ''
 
@@ -206,17 +206,13 @@
 
 		isExternal: function() {
 
-			// Comprobamos si se encuentra definida la localización
-
-			var location = (this.location instanceof Public) ? this.location._attributes : false,
-
 			// Construimos los atributos en base a la localización
 
-				attr = Public.unbuild(this._attributes, location);
+			var attr = Public.unbuild(this._attributes, this.location);
 
 			// Si no se encuentra disponible la instancia localización
 
-			if (!location)
+			if (!(this.location instanceof URL))
 
 				// La dirección será externa si tiene definido el atributo `protocol` o `host`
 
@@ -250,7 +246,7 @@
 
 			while (x--)
 
-				buffer[Public.toString(argv[x]).toLowerCase()] = 1;
+				buffer[_toString(argv[x]).toLowerCase()] = 1;
 
 			// Si se desea eliminar el atributo `hostname` o `port`
 
@@ -339,7 +335,7 @@
 
 			// Nos deshacemos del caracter final `:` para su validación
 
-			input = ((input =  Public.toString(input)).substr(-1) === ':') ? input.substr(0, input.length-1) : input;
+			input = ((input =  _toString(input)).substr(-1) === ':') ? input.substr(0, input.length-1) : input;
 
 			// Si el protocolo es correcto añadimos `:` al final del mismo
 			// si no lo es devolvemos una cadena vacía
@@ -352,7 +348,7 @@
 
 			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
 
-			return Public.normalize.regex_rfc3986_userinfo.test(input = Public.toString(input)) ? input : '';
+			return Public.normalize.regex_rfc3986_userinfo.test(input = _toString(input)) ? input : '';
 
 		},
 
@@ -360,7 +356,7 @@
 
 			var port = '', hostname;
 
-			input = Public.toString(input).split(':');
+			input = _toString(input).split(':');
 
 			// Si se encuentra el caracter `:`
 
@@ -400,7 +396,7 @@
 
 			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
 
-			return Public.normalize.regex_rfc3986_host.test(input = Public.toString(input).toLowerCase()) ? input : '';
+			return Public.normalize.regex_rfc3986_host.test(input = _toString(input).toLowerCase()) ? input : '';
 			
 		},
 
@@ -408,7 +404,7 @@
 
 			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
 
-			return Public.normalize.regex_rfc3986_port.test(input = Public.toString(input)) ? input : '';
+			return Public.normalize.regex_rfc3986_port.test(input = _toString(input)) ? input : '';
 
 		},
 
@@ -418,7 +414,7 @@
 
 			try {
 
-				input = encodeURI(decodeURI(Public.toString(input)));
+				input = encodeURI(decodeURI(_toString(input)));
 
 			} catch(e) {
 
@@ -426,15 +422,41 @@
 
 			}
 
-			// Si la entrada no se encuentra vacía y no comienza con una barra
+			var items = input.split('/'),
+				index = items.length,
+				result = [],
+				back = 0;
 
-			if (input && input.substr(0, 1) !== '/')
+			while (index--) {
 
-				input = '/' + input;
+				// Retroceso de carpeta
 
-			// Simplificamos posibles repeticiones seguidas del carácter `/`
+				if (items[index] === '..') {
 
-			return input.replace(/[\/]{2,}/g, '/');
+					back++;
+
+				// Si solo contiene un punto es ignorado
+
+				} else if (items[index] !== '.') {
+
+					if (!back) {
+
+						result.unshift(items[index]);
+
+					} else {
+
+						back--;
+
+					}
+
+				}
+
+			}
+
+			// Si la carpeta comenzaba con una barra, por mucho retroceso que haya, tendrá que comenzar con una barra
+
+			return ((result = result.join('/')).substr(0, 1) !== '/' && input.substr(0, 1) === '/') ? ('/' + result) : result;
+
 
 		},
 
@@ -470,14 +492,6 @@
 			new Foo(callback), argv
 
 		);
-
-	};
-
-	// Convierte la entrada en cadena de texto
-
-	Public.toString = function(i) {
-
-		return (typeof i === 'string' || typeof i === 'number') ? ('' + i) : '';
 
 	};
 
@@ -528,9 +542,20 @@
 
 		var normalize = Public.normalize, attr, matches, temp;
 
-		// Si la localización está definida como una cadena literal o un objecto lo convertimos a un objecto de atributos normalizados
+		// Si la localización está definida como una instancia URL
+		// una cadena literal o un objecto lo convertimos a un objecto de atributos normalizados
 
-		location = (location && ((temp = typeof location) === 'string' || temp === 'object')) ?  Public.unbuild(location) : false;
+		location = (location instanceof URL) ?
+
+			location.attr() : (
+
+				(location && ((temp = typeof location) === 'string' || temp === 'object')) ?
+
+					Public.unbuild(location) :
+
+					false
+
+			);
 
 		// Si es un elemento HTML
 
@@ -562,16 +587,23 @@
 				auth: normalize.auth(matches[2]),
 				hostname: normalize.hostname(matches[3]),
 				port: normalize.port(matches[4]),
+				pathname: normalize.pathname(matches[5]),
 				search: normalize.search(matches[6]),
-				hash: normalize.hash(matches[7]),
-
-				// Dejamos el atributo `pathname` inctacto para que pueda ser evaluado más tarde
-
-				pathname: Public.toString(matches[5])
+				hash: normalize.hash(matches[7])
 
 			};
 
+		// Si es una instancia de URL
+
+		} else if (input instanceof URL) {
+
+			// Obtenemos los atributos
+
+			attr = input.attr();
+
 		} else {
+
+			// Si no es un objeto forzamos a que lo sea
 
 			if (!input || typeof input !== 'object')
 
@@ -583,13 +615,10 @@
 
 				protocol: normalize.protocol(input.protocol),
 				auth: normalize.auth(input.auth),
+				pathname: normalize.pathname(input.pathname),
 				search: normalize.search(input.search),
-				hash: normalize.hash(input.hash),
-
-				// Dejamos el atributo `pathname` inctacto para que pueda ser evaluado más tarde
-
-				pathname: Public.toString(input.pathname)
-
+				hash: normalize.hash(input.hash)
+				
 			};
 
 			// El atributo `host` tiene preferencia
@@ -663,7 +692,7 @@
 
 								if ('pathname' in location)
 
-									attr.pathname = location.pathname;
+									attr.pathname = normalize.pathname(location.pathname);
 
 								if (!attr.search) {
 
@@ -677,22 +706,13 @@
 
 								}
 
-							} else {
+							// Si el atributo `pathname` no empieza con `/`
 
-								if ('pathname' in location) {
+							} else if ('pathname' in location && attr.pathname.substr(0, 1) !== '/') {
 
-									temp = Public.toString(location.pathname);
+								// Concatenamos los atributos `pathname` eliminando la última carpeta de la localización
 
-									// Carpeta relativa si
-
-									// attr.pathname = a
-									// location.pathname = /b/
-
-									if ((attr.pathname.substr(0, 1) !== '/' && temp.length > 1 && temp.substr(-1) === '/'))
-
-										attr.pathname = temp + attr.pathname;
-
-								}
+								attr.pathname = normalize.pathname(location.pathname).split('/').slice(0, -1).concat(attr.pathname).join('/');
 
 							}
 
@@ -707,10 +727,6 @@
 			delete attr._port;
 
 		}
-
-		// Normalizamos la carpeta
-
-		attr.pathname = normalize.pathname(attr.pathname);
 
 		// Generamos el atributo `host` a partir de los atributos `hostname` y `port`
 
@@ -920,6 +936,12 @@
 
 	// Funciones privadas utilizadas para no repetir código
 
+	function _toString(i) {
+
+		return (typeof i === 'string' || typeof i === 'number') ? ('' + i) : '';
+
+	}
+
 	function _prototypeQuery(type, name, value) {
 
 		var size = arguments.length-1,
@@ -1002,7 +1024,7 @@
 
 		// Convertimos el nombre a cadena de texto
 
-		name = Public.toString(name).toLowerCase();
+		name = _toString(name).toLowerCase();
 
 		// Si el límite se encuentra en el atributo `hostname`
 
@@ -1067,7 +1089,7 @@
 
 			// De lo contrario forzamos a que sea literal y nos deshacemos del primer carácter si es el buscado
 
-			input = ((input = Public.toString(input)) && input.substr(0, 1) === str) ? input.substr(1) : input;
+			input = ((input = _toString(input)) && input.substr(0, 1) === str) ? input.substr(1) : input;
 
 		}
 

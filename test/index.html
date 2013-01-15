@@ -4,7 +4,7 @@
     <head>
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>JavaScript/NodeJS URL v1.2.2</title>
+        <title>JavaScript/NodeJS URL v1.2.3</title>
 
         <link rel="stylesheet" href="qunit.css" />
         <script src="qunit.js"></script>
@@ -14,19 +14,6 @@
         <script src="../url.js"></script>
 
         <script>
-
-            test('URL.toString', function() {
-
-                strictEqual( URL.toString(), '' );
-                strictEqual( URL.toString('str'), 'str' );
-                strictEqual( URL.toString(2), '2' );
-                strictEqual( URL.toString(null), '' );
-                strictEqual( URL.toString(undefined), '' );
-                strictEqual( URL.toString({}), '' );
-                strictEqual( URL.toString([]), '' );
-                strictEqual( URL.toString(function() {}), '' );
-
-            });
 
             test('URL.param', function() {
 
@@ -295,9 +282,13 @@
 
                 strictEqual( normalize.pathname(), '');
 
-                strictEqual( normalize.pathname('a'), '/a');
+                strictEqual( normalize.pathname('a'), 'a');
 
-                strictEqual( normalize.pathname('a//b/////c/'), '/a/b/c/');
+                strictEqual( normalize.pathname('a//b//c/../'), 'a//b//');
+
+                strictEqual( normalize.pathname('/../../a//b//c/../'), '/a//b//');
+
+                strictEqual( normalize.pathname('/./././a'), '/a');
 
                 strictEqual( normalize.pathname('/a/%41%32/<'), '/a/A2/%3C');
 
@@ -374,7 +365,105 @@
 
                 deepEqual(
 
-                    URL.unbuild('second#top', 'https://localhost/first/'), {
+                    URL.unbuild('folder'), {
+
+                        protocol: '',
+                        auth: '',
+                        host: '',
+                        hostname: '',
+                        port: '',
+                        pathname: 'folder',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('/folder'), {
+
+                        protocol: '',
+                        auth: '',
+                        host: '',
+                        hostname: '',
+                        port: '',
+                        pathname: '/folder',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('third', '/first/second'), {
+
+                        protocol: '',
+                        auth: '',
+                        host: '',
+                        hostname: '',
+                        port: '',
+                        pathname: '/first/third',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+
+                deepEqual(
+
+                    URL.unbuild('third', '/first/second/'), {
+
+                        protocol: '',
+                        auth: '',
+                        host: '',
+                        hostname: '',
+                        port: '',
+                        pathname: '/first/second/third',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('..third', '/first/second/'), {
+
+                        protocol: '',
+                        auth: '',
+                        host: '',
+                        hostname: '',
+                        port: '',
+                        pathname: '/first/second/..third',
+                        search: '',
+                        hash: ''
+
+                    }
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('../e/f/g/h/../../h', '/a/b/c/../../c/d').pathname, '/a/c/e/f/h'
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('/../e/f/g/h/../../h/', '/a/b/c/../../c/d').pathname, '/e/f/h/'
+
+                );
+
+                deepEqual(
+
+                    URL.unbuild('second#top', URL('https://localhost/first/')), {
 
                         protocol: 'https:',
                         auth: '',
@@ -406,6 +495,7 @@
 
                 );
 
+
                 deepEqual(
 
                     URL.unbuild('//address', 'ftp://localhost/first?a=1#top'), {
@@ -416,23 +506,6 @@
                         hostname: 'address',
                         port: '',
                         pathname: '',
-                        search: '',
-                        hash: ''
-
-                    }
-
-                );
-
-                deepEqual(
-
-                    URL.unbuild('last', '/first/'), {
-
-                        protocol: '',
-                        auth: '',
-                        host: '',
-                        hostname: '',
-                        port: '',
-                        pathname: '/first/last',
                         search: '',
                         hash: ''
 
@@ -610,7 +683,7 @@
 
                 strictEqual(
 
-                    url.href('folder').href(), '/folder'
+                    url.href('folder').href(), 'folder'
             
                 );
 
@@ -625,7 +698,9 @@
 
                 strictEqual( URL(input).href(), input );
 
-                strictEqual( URL('folder////path///test').href(), '/folder/path/test' );
+                strictEqual( URL('a/b/c/../../d').href(), 'a/d' );
+
+                strictEqual( URL('folder////path///test').href(), 'folder////path///test' );
 
                 strictEqual( URL({ hostname: 'localhost' }).href(), '//localhost' );
 
