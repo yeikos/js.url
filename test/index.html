@@ -4,7 +4,7 @@
     <head>
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>JavaScript/NodeJS URL v1.2.3</title>
+        <title>JavaScript/NodeJS URL v1.2.4</title>
 
         <link rel="stylesheet" href="qunit.css" />
         <script src="qunit.js"></script>
@@ -17,7 +17,7 @@
 
             test('URL.param', function() {
 
-                strictEqual( URL.param(), '' );
+               strictEqual( URL.param(), '' );
 
                 strictEqual(
 
@@ -58,8 +58,20 @@
 
                     }), 
 
-                    'spaces+are+replaced+by+%2B=1+%2B+1+%3D+2&%3D!%24%5B.%5D[%5Bspecial+characters+are+scaped%5D%3D%3E]=%2B%2B%24&' +
-                    'object[0]=x&object[1]=y&object[2]=z&object[array][0]=i&object[array][1]=j&object[array][2]=k&a[b][c]&a[b][d]&a[b][e]=1&a[b][f]&a[b][g]&a[b][h]'
+                    'spaces+are+replaced+by+%2B=1+%2B+1+%3D+2&' +
+                    '%3D!%24%5B.%5D[%5Bspecial+characters+are+scaped%5D%3D%3E]=%2B%2B%24&' +
+                    'object[0]=x&' +
+                    'object[1]=y&' +
+                    'object[2]=z&' +
+                    'object[array][0]=i&' +
+                    'object[array][1]=j&' +
+                    'object[array][2]=k&' +
+                    'a[b][c]&' +
+                    'a[b][d]&' +
+                    'a[b][e]=1&' +
+                    'a[b][f]&' +
+                    'a[b][g]&' +
+                    'a[b][h]'
 
                 );
 
@@ -69,32 +81,48 @@
 
                 deepEqual( URL.unparam(), {} );
 
+                deepEqual( URL.unparam('%xx=1'), {} );
+
                 deepEqual(
 
                     URL.unparam(
 
-                        'spaces+are+replaced+by+%2B=1+%2B+1+%3D+2&%3D!%24%5B.%5D[%5Bspecial+characters+are+scaped%5D%3D%3E]=%2B%2B%24&' +
-                        'object[0]=x&object[1]=y&object[2]=z&object[array][0]=i&object[array][1]=j&object[array][2]=k&a[b][c]&a[b][d]&a[b][e]=1&a[b][f]&a[b][g]&a[b][h]'
+                        'spaces+are+replaced+by+%2B=1+%2B+1+%3D+2&' +
+                        '%3D!%24%5B.%5D[%5Bspecial+characters+are+scaped%5D%3D%3E]=%2B%2B%24&' +
+                        'object[0]=x&' +
+                        'object[1]=y&' +
+                        'object[2]=z&' +
+                        'object[array][0]=i&' +
+                        'object[array][1]=j&' +
+                        'object[array][2]=k&' +
+                        'a[b][c]&' +
+                        'a[b][d]&' +
+                        'a[b][e]=1&' +
+                        'a[b][f]&' +
+                        'a[b][g]&' +
+                        'a[b][h]'
 
-                    ), 
+                    ), {
 
-                    {
+                       'spaces are replaced by +': '1 + 1 = 2',
 
-                        'spaces are replaced by +': '1 + 1 = 2',
+                        '=!$': {
 
-                        '=!$[.]': {
+                            '.': {
 
-                            '[special characters are scaped]=>': '++$'
+                                '[special characters are scaped': '++$'
+
+                            }
 
                         },
 
-                        'object': {
+                        object: {
 
                             0: 'x',
                             1: 'y',
                             2: 'z',
 
-                            'array': {
+                            array: {
 
                                 0: 'i',
                                 1: 'j',
@@ -121,6 +149,59 @@
 
                     }
 
+                );
+
+               deepEqual(
+
+                    URL.unparam(
+
+                        'a%5B0%5D=hello&' +
+                        'a%5B2%5D=javascript&' +
+                        'a%5Bx%5D=from&' +
+                        'a%5Bz%5D=language&' +
+                        'b%5B3%5D=three&' +
+                        'b%5Bc%5D%5Bd%5D%5B2%5D=two&' +
+                        'c%5B0%5D=one&' +
+                        'c%5B1%5D=two&' +
+                        'c%5B2%5D=three'
+
+                    ), {
+
+                        a: {
+
+                            0: 'hello',
+                            2: 'javascript',
+                            x: 'from',
+                            z: 'language'
+
+                        },
+
+                        b: {
+
+                            3: 'three',
+
+                            c: {
+
+                                d: {
+
+                                    2: 'two'
+
+                                }
+
+                            }
+
+                        },
+
+                        c: {
+
+                            0: 'one',
+                            1: 'two',
+                            2: 'three'
+
+                        }
+
+                    }
+                    
                 );
 
             });

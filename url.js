@@ -1,8 +1,9 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.3
- * @autor yeikos
-
- * Copyright 2013 - https://github.com/yeikos/js.url
+ * @name JavaScript/NodeJS URL v1.2.4
+ * @author yeikos
+ * @repository https://github.com/yeikos/js.url
+ 
+ * Copyright 2013
  * GNU General Public License
  * http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -212,7 +213,7 @@
 
 			// Si no se encuentra disponible la instancia localización
 
-			if (!(this.location instanceof URL))
+			if (!(this.location instanceof Public))
 
 				// La dirección será externa si tiene definido el atributo `protocol` o `host`
 
@@ -335,7 +336,9 @@
 
 			// Nos deshacemos del caracter final `:` para su validación
 
-			input = ((input =  _toString(input)).substr(-1) === ':') ? input.substr(0, input.length-1) : input;
+			var size = (input = _toString(input)).length;
+
+			input = (input.substr(size-1, 1) === ':') ? input.substr(0, input.length-1) : input;
 
 			// Si el protocolo es correcto añadimos `:` al final del mismo
 			// si no lo es devolvemos una cadena vacía
@@ -487,9 +490,11 @@
 
 		};
 
+		argv = (typeof argv === 'object' && argv) ? [].slice.call(argv, 0) : argv;
+
 		return (Foo.prototype = Public.prototype).constructor.apply(
 
-			new Foo(callback), argv
+			new Foo(callback), ((argv instanceof Array) ? argv : [])
 
 		);
 
@@ -499,9 +504,11 @@
 
 	Public.getElementURL = function(input) {
 
-		var temp;
+		if (!_isElement(input))
 
-		return (_isElement(input) && (temp = (input instanceof HTMLFormElement) ? 'action' : (
+			return '';
+
+		var temp = (typeof HTMLElement === 'function') ? (((temp = (input instanceof HTMLFormElement) ? 'action' : (
 
 			((input instanceof HTMLAnchorElement) || (input instanceof HTMLBaseElement) || (input instanceof HTMLLinkElement)) ? 'href' : (
 
@@ -509,7 +516,26 @@
 
 			)
 
-		))) ? input.getAttribute(temp) : '';
+		))) ? temp : '') : (
+
+			(temp = ((temp = input.nodeName.toLowerCase()) === 'form') ? 'action' : (
+
+				(temp === 'a' || temp === 'base' || temp === 'link') ? 'href' : (
+
+					(temp === 'img' || temp === 'script' || temp === 'iframe') ? 'src' : 0
+
+				)
+			)
+
+		) ? temp : '');
+
+		return (
+
+			(typeof input.getAttribute === 'function' || (typeof input.getAttribute === 'object' && input.getAttribute)) &&
+
+			(temp = input.getAttribute(temp))
+
+		) ? temp : '';
 
 	};
 
@@ -545,7 +571,7 @@
 		// Si la localización está definida como una instancia URL
 		// una cadena literal o un objecto lo convertimos a un objecto de atributos normalizados
 
-		location = (location instanceof URL) ?
+		location = (location instanceof Public) ?
 
 			location.attr() : (
 
@@ -595,7 +621,7 @@
 
 		// Si es una instancia de URL
 
-		} else if (input instanceof URL) {
+		} else if (input instanceof Public) {
 
 			// Obtenemos los atributos
 
@@ -805,6 +831,18 @@
 		if (typeof input !== 'string')
 
 			return {};
+
+		// Decodificamos de forma segura
+
+		try {
+
+			input = decodeURI(input);
+
+		} catch(e) {
+
+			return {};
+
+		}
 
 		// Variables de itineración
 
@@ -1111,7 +1149,11 @@
 
 	function _isElement(input) {
 
-		return (typeof HTMLElement === 'function' && input instanceof HTMLElement);
+		return (typeof HTMLElement === 'function') ?
+
+			(input instanceof HTMLElement) :
+
+			(input && typeof input === 'object' && input.nodeType === 1 && typeof input.nodeName === 'string');
 
 	}
 

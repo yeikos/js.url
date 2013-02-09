@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.2.3
+JavaScript/NodeJS URL v1.2.4
 ==================================================
 
 What is this?
@@ -20,6 +20,11 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 
 Changelog
 --------------------------------------
+
+**v1.2.4 - 09/02/13**
+
+- Bug fix in Internet Explorer (dom elements).
+- Bug fix in `URL.unparam`.
 
 **v1.2.3 - 15/01/13**
 
