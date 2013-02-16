@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="JavaScript/NodeJS URL : JavaScript/NodeJS URL it's an JavaScript class that parses an URL and convert it into a object with similar properties to object Location (window.location). Also included inverse process (object to URL string), and a lot of features that it will help you to modify a URL easily.  Compatible with browser JavaScript and NodeJS (https://npmjs.org/package/kurl)." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>JavaScript/NodeJS URL</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/yeikos/js.url">View on GitHub</a>
+
+          <h1 id="project_title">JavaScript/NodeJS URL</h1>
+          <h2 id="project_tagline">JavaScript/NodeJS URL it's an JavaScript class that parses an URL and convert it into a object with similar properties to object Location (window.location). Also included inverse process (object to URL string), and a lot of features that it will help you to modify a URL easily.  Compatible with browser JavaScript and NodeJS (https://npmjs.org/package/kurl).</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/yeikos/js.url/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/yeikos/js.url/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>JavaScript/NodeJS URL v1.2.4</h1>
+
+<h2>What is this?</h2>
+
+<p>It's an JavaScript class that parses an URL and convert it into a object with similar properties to object Location (window.location). Also included inverse process (object to URL string), and a lot of features that it will help you to modify a URL easily. </p>
+
+<p>Compatible with browser JavaScript and NodeJS (<a href="https://npmjs.org/package/kurl">https://npmjs.org/package/kurl</a>).</p>
+
+<h2>Demo online</h2>
+
+<p><a href="http://jsfiddle.net/yeikos/a2LdT/">http://jsfiddle.net/yeikos/a2LdT/</a></p>
+
+<h2>More info</h2>
+
+<p><a href="http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html">http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html</a></p>
+
+<h2>Changelog</h2>
+
+<p><strong>v1.2.4 - 09/02/13</strong></p>
+
+<ul>
+<li>Bug fix in Internet Explorer (dom elements).</li>
+<li>Bug fix in <code>URL.unparam</code>.</li>
+</ul><p><strong>v1.2.3 - 15/01/13</strong></p>
+
+<ul>
+<li>Bug fix in <code>URL.normalize.pathname</code>: absolute path is converted to canonical.</li>
+<li>Location argument now can be a URL instance.</li>
+<li>Code more clean and lightweight.</li>
+</ul><p><strong>v1.2.2 - 12/01/13</strong></p>
+
+<ul>
+<li>Bug fix in <code>_prototypeSelect</code>: variable <code>size</code> was not declared.</li>
+</ul><p><strong>v1.2.1 - 11/01/13</strong></p>
+
+<ul>
+<li>Added to prototype: <code>instance</code>.</li>
+<li>Constructor improved.</li>
+<li>Bug fix in <code>_prototypeSelect</code>: <code>select</code>, <code>unselect</code>, <code>from</code>, <code>to</code>.</li>
+<li>Bug fix in <code>URL.normalize.host</code>: it will be converted to lowercase.</li>
+</ul><p><strong>v1.2.0 - 10/01/13</strong></p>
+
+<ul>
+<li>Added to prototype: <code>unselect</code>.</li>
+</ul><p><strong>v1.1.0 - 09/01/13</strong></p>
+
+<ul>
+<li>Added to prototype: <code>isExternal</code>, <code>select</code>, <code>from</code>, <code>to</code>.</li>
+<li>Renamed prototype methods: <code>query</code> to <code>search</code> and <code>queryHash</code> to <code>hash</code>.</li>
+<li>URL argument now can be a DOM element.</li>
+<li>Code more clean and lightweight.</li>
+<li>Bug fix and optimizations.</li>
+</ul><h2>Example</h2>
+
+<pre><code>&lt;html&gt;
+
+    &lt;head&gt;
+
+        &lt;script type="text/javascript" src="https://raw.github.com/yeikos/js.url/master/url.js"&gt;&lt;/script&gt;
+
+        &lt;script type="text/javascript"&gt;
+
+            var url = URL('http://guest:secret@remote:21/filename?a=1#ok');
+
+            console.log(
+
+                url.attr() 
+
+                /*{ 
+
+                    protocol: 'http:',
+                    auth: 'guest:secret',
+                    host: 'remote:21',
+                    hostname: 'remote',
+                    port: 21,
+                    pathname: '/filename',
+                    search: '?a=1',
+                    hash: '#ok'
+
+                }*/
+
+            );
+
+            console.log(
+
+                url.attr('hostname') 
+
+                // remote
+
+            );
+
+            console.log(
+
+                url.attr('hostname', 'localhost').href()
+
+                // http://guest:secret@localhost:21/filename?a=1#ok
+
+            );
+
+            console.log(
+
+                url.attr('search'),
+
+                // ?a=1
+
+                url.search('b', 2).search(),
+
+                // { a : 1, b : 2 }
+
+                url.attr('search')
+
+                // ?a=1&amp;b=2
+
+            );
+
+            console.log(
+
+                url.hash({ a: 1 }).select('hostname', 'pathname', 'hash')
+
+                // //localhost/filename#a=1
+
+            );
+
+            console.log(
+
+                URL('http://localhost', 'https://localhost').isExternal(),
+
+                // true
+
+                URL('/folder', 'https://localhost').isExternal()
+
+                // false
+
+            );
+
+            console.log(
+
+                URL('subsection?a=1', 'http://localhost/section/').from('pathname')
+
+                // /section/subsection?a=1
+
+            );
+
+        &lt;/script&gt;
+
+    &lt;/head&gt;
+
+    &lt;body&gt;See console log.&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+<h2>Attributes</h2>
+
+<p>The attributes names match with of Location Object Properties (<a href="http://www.w3schools.com/jsref/obj_location.asp">http://www.w3schools.com/jsref/obj_location.asp</a>), except <code>href</code> that it's ignored, and <code>auth</code> that it`s added.</p>
+
+<p>Attributes: <code>protocol</code>, <code>auth</code>, <code>host</code>, <code>hostname</code>, <code>port</code>, <code>pathname</code>, <code>search</code>, <code>hash</code>.</p>
+
+<h2>API methods</h2>
+
+<h3>Constructor (URL)</h3>
+
+<hr><p><strong>URL(url, location)</strong></p>
+
+<p><em>url: string, attributes object or DOM element (optional).</em></p>
+
+<p><em>location: string, attributes object, DOM element or URL instance (optional).</em></p>
+
+<blockquote>
+<p>Creates a new instance with an URL in base to the location introduced.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<hr><h3>Local methods (URL.prototype)</h3>
+
+<hr><p><strong>url.location</strong></p>
+
+<blockquote>
+<p>It's a URL instance added automatically by the constructor, and his attributes are used internally to calculate the result in base to the location defined.</p>
+</blockquote>
+
+<hr><p><strong>url.href()</strong></p>
+
+<blockquote>
+<p>Builds an URL string in base to current attributes values.</p>
+</blockquote>
+
+<p>returns URL string.</p>
+
+<p><strong>url.href(url)</strong></p>
+
+<p><em>url: string, attributes object or DOM element.</em></p>
+
+<blockquote>
+<p>Sets a new URL that replaces all attributes.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<hr><p><strong>url.attr()</strong></p>
+
+<blockquote>
+<p>Gets all attributes.</p>
+</blockquote>
+
+<p>returns attributes object.</p>
+
+<p><strong>url.attr(name)</strong></p>
+
+<p><em>name: attribute name (string).</em></p>
+
+<blockquote>
+<p>Gets value of the attribute.</p>
+</blockquote>
+
+<p>returns string.</p>
+
+<p><strong>url.attr(object)</strong></p>
+
+<p><em>object: attributes object.</em></p>
+
+<blockquote>
+<p>Sets multiple values to the attributes.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<p><strong>url.attr(name, value)</strong></p>
+
+<p><em>name: attribute name (string).</em></p>
+
+<p><em>value: attribute value.</em></p>
+
+<blockquote>
+<p>Sets a new value to the attribute.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<hr><p><strong>url.search()</strong></p>
+
+<blockquote>
+<p>Gets search attribute in object format.</p>
+</blockquote>
+
+<p>returns object.</p>
+
+<p><strong>url.search(name)</strong></p>
+
+<p><em>name: attribute name (string).</em></p>
+
+<blockquote>
+<p>Gets the value of component.</p>
+</blockquote>
+
+<p>returns string.</p>
+
+<p><strong>url.search(object)</strong></p>
+
+<p><em>object: compontents object.</em></p>
+
+<blockquote>
+<p>Replaces all compontents by the object introduced.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<p><strong>url.search(name, value)</strong></p>
+
+<p><em>name: compontent name (string).</em></p>
+
+<p><em>value: compontent value. If it's <code>null</code> the compontent will be delete.</em></p>
+
+<blockquote>
+<p>Sets a new value to the compontent.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<hr><p><strong>url.hash()</strong></p>
+
+<blockquote>
+<p>Gets hash attribute in object format.</p>
+</blockquote>
+
+<p>returns object.</p>
+
+<p><strong>url.hash(name)</strong></p>
+
+<p><em>name: attribute name (string).</em></p>
+
+<blockquote>
+<p>Gets the value of component.</p>
+</blockquote>
+
+<p>returns string.</p>
+
+<p><strong>url.hash(object)</strong></p>
+
+<p><em>object: compontents object.</em></p>
+
+<blockquote>
+<p>Replaces all components by the object introduced.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<p><strong>url.hash(name, value)</strong></p>
+
+<p><em>name: compontent name (string).</em></p>
+
+<p><em>value: compontent value. If it's <code>null</code> the compontent will be delete.</em></p>
+
+<blockquote>
+<p>Sets a new value to the compontent.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<hr><p><strong>url.isExternal()</strong></p>
+
+<blockquote>
+<p>Checks if the address is external in base to the location.</p>
+</blockquote>
+
+<p>returns true or false (boolean).</p>
+
+<hr><p><strong>url.select(name, name, ...)</strong></p>
+
+<p><em>name: attributes names (string).</em></p>
+
+<blockquote>
+<p>Builds an URL string using only selected attributes.</p>
+</blockquote>
+
+<p>returns URL (string).</p>
+
+<hr><p><strong>url.unselect(name, name, ...)</strong></p>
+
+<p><em>name: attributes names (string).</em></p>
+
+<blockquote>
+<p>Builds an URL string excluding selected attributes.</p>
+</blockquote>
+
+<p>returns URL (string).</p>
+
+<hr><p><strong>url.from(name)</strong></p>
+
+<p><em>name: attribute name (string).</em></p>
+
+<blockquote>
+<p>Builds an URL string starting from the selected attribute.</p>
+</blockquote>
+
+<p>returns URL (string).</p>
+
+<hr><p><strong>url.to(name)</strong></p>
+
+<p><em>name: attribute name (string).</em></p>
+
+<blockquote>
+<p>Builds an URL string starting from the beginning to the selected attribute.</p>
+</blockquote>
+
+<p>returns URL (string).</p>
+
+<hr><h3>Global methods (URL)</h3>
+
+<hr><p><strong>URL.instance(argv, callback)</strong></p>
+
+<p><em>argv: array argument of the constructor (optional).</em>
+<em>callback: function whose context is the new instance (optional).</em></p>
+
+<blockquote>
+<p>Create a new URL instance with arguments, calling first to callback and finally to constructor.</p>
+</blockquote>
+
+<p>returns instance.</p>
+
+<hr><p><strong>URL.getElementURL(element)</strong></p>
+
+<p><em>element: element object (DOM Element).</em></p>
+
+<blockquote>
+<p>Gets element URL (form, a, base, link, img, script, iframe).</p>
+</blockquote>
+
+<p>returns URL if found or empty string if not found (string).</p>
+
+<hr><p><strong>URL.build(url, location)</strong></p>
+
+<p><em>url: string, attributes object or DOM element.</em></p>
+
+<p><em>location: string, attributes object, DOM element or URL instance (optional).</em></p>
+
+<blockquote>
+<p>Builds a new URL based in attributes introduced and doing use location attributes.</p>
+</blockquote>
+
+<p>returns URL (string).</p>
+
+<hr><p><strong>URL.unbuild(url, location)</strong></p>
+
+<p><em>url: string, attributes object or DOM element.</em></p>
+
+<p><em>location: string, attributes object, DOM element or URL instance (optional).</em></p>
+
+<blockquote>
+<p>Unbuilds URL to converting it into a attributes object and doing use location attributes.</p>
+</blockquote>
+
+<p>returns attributes object.</p>
+
+<hr><p><strong>URL.param(query)</strong></p>
+
+<p><em>query: query object.</em></p>
+
+<blockquote>
+<p>Converts a object into query string.</p>
+</blockquote>
+
+<p>returns query string.</p>
+
+<hr><p><strong>URL.unparam(query)</strong></p>
+
+<p><em>query: query string.</em></p>
+
+<blockquote>
+<p>Converts a query string into object.</p>
+</blockquote>
+
+<p>returns query object.</p>
+
+<hr>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">JavaScript/NodeJS URL maintained by <a href="https://github.com/yeikos">yeikos</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
