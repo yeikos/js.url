@@ -4,7 +4,7 @@
 
 		<title>JavaScript/NodeJS URL</title>
 
-		<!--<script type="text/javascript" src="https://raw.github.com/yeikos/js.url/master/url.js"></script>-->
+		<!--<script type="text/javascript" src="https://yeikos.googlecode.com/files/url.js"></script>-->
 
 		<script type="text/javascript" src="../url.js"></script>
 
@@ -67,7 +67,7 @@
 
 				'Example 4',
 
-				URL('http://localhost/?a=1&b[]=2').search()
+				URL('http://localhost/?a=1&b[]=2').query() // `query` is alias to `search`
 
 			);
 
@@ -129,13 +129,13 @@
 
 			);
 
-			// a=1&b[][0]=x&b[][1]=y&b[][2]=z&b[c][d][e]=ok
+			// a=1&b[]=x&b[]=y&b[]=z&c[d][e]=ok
 
 			console.log(
 
 				'Example 8',
 
-				URL.unparam('a=1&b[0]=x&b[1]=y&b[2]=z&c[d][e]=ok')
+				URL.unparam('a=1&b[]=x&b[]=y&b[]=z&c[d][e]=ok')
 
 			);
 
@@ -145,13 +145,7 @@
 
 					a: 1,
 
-					b: {
-
-						0: 'x',
-						1: 'y',
-						2: 'z'
-
-					},
+					b: ['x', 'y', 'z'],
 
 					c: {
 

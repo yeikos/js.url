@@ -1,10 +1,36 @@
 {
 	
 	"name": "kurl",
-	"version": "1.2.4",
-	"author": "yeikos",
-	"description": "It's an javascript class that parses an URL and convert it into a object with similar properties to object Location (window.location). Also included inverse process (object to URL string), and a lot of features that it will help you to modify a URL easily.",
-	"homepage": "https://github.com/yeikos/js.url",
-	"main": "url.js"
-	
+	"version": "1.2.5",
+	"author": "yeikos (http://www.yeikos.com)",
+	"description": "It's a powerfull URL parser written in JavaScript and compatible with NodeJS with a lot of features that it will help you to modify/parse easily a URL without any problem.",
+	"main": "url.js",
+
+	"licenses": [{
+
+		"type" : "MIT",
+		"url" : "https://raw.github.com/yeikos/js.url/master/LICENSE"
+
+	}],
+
+	"homepage": "http://www.yeikos.com",
+
+	"repository": {
+
+		"type": "git",
+		"url": "https://github.com/yeikos/js.url.git"
+
+	},
+
+	"keywords": [
+
+		"url", 
+		"parser",
+		"query",
+		"parse", 
+		"param", 
+		"unparam"
+		
+	]
+
 }

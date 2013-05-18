@@ -1,10 +1,10 @@
-JavaScript/NodeJS URL v1.2.4
+JavaScript/NodeJS URL v1.2.5
 ==================================================
 
 What is this?
 --------------------------------------
 
-It's an JavaScript class that parses an URL and convert it into a object with similar properties to object Location (window.location). Also included inverse process (object to URL string), and a lot of features that it will help you to modify a URL easily. 
+It's a powerfull URL parser written in JavaScript with a lot of features that it will help you to modify/parse easily a URL without any problem.
 
 Compatible with browser JavaScript and NodeJS (https://npmjs.org/package/kurl).
 
@@ -20,6 +20,14 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 
 Changelog
 --------------------------------------
+
+**v1.2.5 - 18/05/13**
+
+- New license: MIT.
+- Added to prototype: `query` (alias to `search`)
+- Bug fix in `URL.attr` (`port`).
+- Bug fix and improvements in `URL.param` and `URL.unparam`.
+- Tests are common to browser JavaScript and NodeJS.
 
 **v1.2.4 - 09/02/13**
 
@@ -62,7 +70,7 @@ Example
 
 		<head>
 
-			<script type="text/javascript" src="https://raw.github.com/yeikos/js.url/master/url.js"></script>
+			<script type="text/javascript" src="https://yeikos.googlecode.com/files/url.js"></script>
 
 			<script type="text/javascript">
 
@@ -105,15 +113,15 @@ Example
 
 				console.log(
 
-					url.attr('search'),
+					url.attr('query'),
 
 					// ?a=1
 
-					url.search('b', 2).search(),
+					url.query('b', 2).query(),
 
 					// { a : 1, b : 2 }
 
-					url.attr('search')
+					url.attr('query')
 
 					// ?a=1&b=2
 
@@ -160,7 +168,7 @@ Attributes
 
 The attributes names match with of Location Object Properties (http://www.w3schools.com/jsref/obj_location.asp), except `href` that it's ignored, and `auth` that it`s added.
 
-Attributes: `protocol`, `auth`, `host`, `hostname`, `port`, `pathname`, `search`, `hash`.
+Attributes: `protocol`, `auth`, `host`, `hostname`, `port`, `pathname`, `search` (or `query`), `hash`.
 
 API methods
 --------------------------------------
@@ -272,6 +280,12 @@ _value: compontent value. If it's `null` the compontent will be delete._
 > Sets a new value to the compontent.
 
 returns instance.
+
+***
+
+**url.query**
+
+> Alias to `url.search`.
 
 ***
 

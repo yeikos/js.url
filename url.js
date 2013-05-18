@@ -1,14 +1,13 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.4
+ * @name JavaScript/NodeJS URL v1.2.5
  * @author yeikos
  * @repository https://github.com/yeikos/js.url
- 
- * Copyright 2013
- * GNU General Public License
- * http://www.gnu.org/licenses/gpl-3.0.txt
+
+ * Copyright 2013 yeikos - MIT license
+ * https://raw.github.com/yeikos/js.url/master/LICENSE
  */
 
-;(function(node, undefined) {
+;(function(isNode, undefined) {
 
 	var Public = function URL(url, location) {
 
@@ -28,7 +27,7 @@
 
 		if (!this.isLocation)
 
-			// Creamos la instancia `location`con un marcador para evitar repetir código
+			// Creamos la instancia `location` con un marcador para evitar repetir código
 
 			this.location = Public.instance((arguments.length > 1)  ? [location] : [], function() {
 
@@ -118,6 +117,12 @@
 
 				if ((temp = typeof name) === 'string') { // get()
 
+					name = name.toLowerCase();
+
+					if (name === 'query')
+
+						name = 'search';
+
 					// Devolvemos el valor del atributo en formato literal
 
 					return _toString(this._attributes[name.toLowerCase()]);
@@ -152,26 +157,44 @@
 
 						// Si se trata del atributo `host` o `hostname`
 
-						if (name === 'host' || name === 'hostname') {
+						if (name === 'host' || name === 'hostname' || name === 'port') {
 
 							// Si el atributo es `host` actualizamos el `hostname` y el `port` (hostname:port)
 							// Si el atributo es `hostname` actualizamos el `host` y dejamos el `port` intacto
+							// Si el atributo es `port` actualizaremos `host` y `hostname`
 
-							temp = Public.normalize.host(
+							if (name === 'port') {
 
-								_toString(value) + (
+								temp = {
 
-									(name === 'hostname' && this._attributes.port) ? (':' + this._attributes.port) : ''
+									hostname: this._attributes.hostname,
+									port: Public.normalize.port(value)
 
-								)
+								};
 
-							);
+							} else {
+
+								temp = Public.normalize.host(
+
+									_toString(value) + (
+
+										(name === 'hostname' && this._attributes.port) ? (':' + this._attributes.port) : ''
+
+									)
+
+								);
+
+							}
 
 							this._attributes.host = temp.hostname + (temp.port ? (':' + temp.port) : '');
 							this._attributes.hostname = temp.hostname;
 							this._attributes.port = temp.port;
-				
+
 						} else {
+
+							if (name === 'query')
+
+								name = 'search';
 
 							// Establecemos el nuevo valor normalizado del atributo
 
@@ -302,22 +325,26 @@
 
 	};
 
+	Public.prototype.query = Public.prototype.search;
+
+	Public.version = '1.2.5';
+
 	// Atributos válidos de la URL
 
-	Public.attributes = ['protocol', 'auth', 'host', 'hostname', 'port', 'pathname', 'search', 'hash'];
+	Public.attributes = ['protocol', 'auth', 'host', 'hostname', 'port', 'pathname', 'search', 'query', 'hash'];
 
 	// Normalización de la URL
 
 	Public.normalize = {
-
-		// http://tools.ietf.org/html/rfc3986
-		// http://jmrware.com/articles/2009/uri_regexp/URI_regex.html
 
 		// Clasificación de las partes de una URL
 
 		regexp_split: /^(?:(?:(.+:)?\/\/)(?:(?:(.+)@)?([^\/:]+)(?::([^\/]+))?)?)?(?:(\/?[^?#]*)?(\?[^#]*)?(#.*)?)?/,
 
 		// Validación de las diversas partes de una URL en base al estandar RFC3986
+
+		// http://tools.ietf.org/html/rfc3986
+		// http://jmrware.com/articles/2009/uri_regexp/URI_regex.html (regex_rfc3986_*)
 
 		regex_rfc3986_schema: /^[a-z][\w+\-.]*$/i,
 		regex_rfc3986_userinfo: /^(?:[\w\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*$/,
@@ -327,7 +354,7 @@
 		// La validación del atributo `pathname` y `query` es innecesaria, ya que la función encodeURI se encarga de normalizarla
 
 		// regex_rfc3986_path: /^(?:(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|\/(?:(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*)?|(?:[\w\-._~!$&'()*+,;=@]|%[0-9A-Fa-f]{2})+(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})+(?:\/(?:[\w\-._~!$&'()*+,;=:@]|%[0-9A-Fa-f]{2})*)*|)$/,
-		
+
 		// regex_rfc3986_query: /^(?:[\w\-._~!$&'()*+,;=:@\/?]|%[0-9A-Fa-f]{2})*$/,
 
 		// Normalización de los atributos de una URL
@@ -400,7 +427,7 @@
 			// Si la entrada no es válida deacuerdo al estandar devolvemos una cadena vacía
 
 			return Public.normalize.regex_rfc3986_host.test(input = _toString(input).toLowerCase()) ? input : '';
-			
+
 		},
 
 		port: function(input) {
@@ -644,7 +671,7 @@
 				pathname: normalize.pathname(input.pathname),
 				search: normalize.search(input.search),
 				hash: normalize.hash(input.hash)
-				
+
 			};
 
 			// El atributo `host` tiene preferencia
@@ -780,13 +807,15 @@
 
 				empty = true,
 
-				index, item, key;
+				index, subindex = 0, item, key;
+
+			input = _object2array(input);
 
 			for (index in input) {
 
 				empty = false;
 
-				key = prefix ? (prefix + '[' + encodeURIComponent(index) + ']') : encodeURIComponent(index);
+				key = prefix ? (prefix + '[' + ((input instanceof Array) ? '' : encodeURIComponent(index)) + ']') : encodeURIComponent(index);
 
 				result.push(
 
@@ -852,11 +881,17 @@
 
 		// Otras variables
 
-			key, value, link, temp,
+			key, value, link, temp, subtemp,
 
 		// Números enteros que no empiecen por cero
 
-			expNumber = /^[1-9]d*/,
+			expNumber = /^[0-9]d*/,
+
+			isNumber = function(n) {
+
+				return !isNaN(parseFloat(n)) && isFinite(n);
+
+			},
 
 		// Nombre de la clave
 
@@ -905,7 +940,7 @@
 			if ((subitems = subitems.match(expKeyNodes))) {
 
 				if (!result[key])
-					
+
 					result[key] = {};
 
 				// Enlazamos desde el nivel inicial
@@ -920,17 +955,24 @@
 
 					if (!(item = (item = subitems[subindex]).substr(1, item.length-2))) {
 
-						// Obtenemos el número más alto de las claves del objecto `link`
+						// Obtenemos el número más alto de las claves del objecto `link` y le sumamos uno
 
-						item = -1;
+						item = subtemp = 0;
 
-						for (temp in link)
+						for (temp in link) {
 
-							if (expNumber.test(temp) && temp > item)
+							if (expNumber.test(temp) && temp >= item) {
 
 								item = temp;
+								subtemp = 1;
 
-						++item;
+							}
+
+						}
+
+						if (subtemp)
+
+							++item;
 
 					}
 
@@ -942,7 +984,7 @@
 
 						// Establecemos su valor final
 
-						link[item] = value;
+						link[item] = isNumber(value) ? Number(value) : value;
 
 					} else {
 
@@ -958,15 +1000,31 @@
 
 					}
 
+
 				}
+
 
 			} else {
 
-				result[key] = value;
+				result[key] = isNumber(value) ? Number(value) : value;
 
 			}
 
 		}
+
+		// Convertimos los objetos con índice numérico en serie a matrices
+
+		temp = function(input) {
+
+			for (var index in input)
+
+				if (typeof input[index] === 'object' && input[index])
+
+					temp(input[index] = _object2array(input[index]));
+
+		};
+
+		temp(result);
 
 		return result;
 
@@ -1147,6 +1205,34 @@
 
 	}
 
+	// Convierte un objeto con claves númericas en serie (0, 1, 2, ...) a una matriz
+
+	function _object2array(input) {
+
+		var index,
+			subindex = 0,
+			result = [];
+
+		if (typeof input !== 'object' || !input)
+
+			return input;
+
+		for (index in input) {
+
+			if (subindex++ != index)
+
+				return input;
+
+			result.push(input[index]);
+
+		}
+
+		return result;
+
+	}
+
+	// Comprueba si el objeto es un elemento HTML
+
 	function _isElement(input) {
 
 		return (typeof HTMLElement === 'function') ?
@@ -1159,6 +1245,6 @@
 
 	// Acceso público a la clase (navegador y NodeJS)
 
-	return node ? (module.exports = Public) : (window[publicName] = Public);
+	return isNode ? (module.exports = Public) : (window[publicName] = Public);
 
 })((typeof module === 'object' && module && typeof module.exports === 'object' && module.exports));
