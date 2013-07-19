@@ -74,7 +74,7 @@ Example
 
 		<head>
 
-			<script type="text/javascript" src="https://files.yeikos.com/url.js"></script>
+			<script type="text/javascript" src="http://files.yeikos.com/url.js"></script>
 
 			<script type="text/javascript">
 
