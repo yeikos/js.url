@@ -1,4 +1,4 @@
-JavaScript/NodeJS URL v1.2.5
+JavaScript/NodeJS URL v1.2.6
 ==================================================
 
 What is this?
@@ -20,6 +20,10 @@ http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
 
 Changelog
 --------------------------------------
+
+**v1.2.6 - 19/07/13**
+
+- Updated examples.
 
 **v1.2.5 - 18/05/13**
 
@@ -70,7 +74,7 @@ Example
 
 		<head>
 
-			<script type="text/javascript" src="https://yeikos.googlecode.com/files/url.js"></script>
+			<script type="text/javascript" src="https://files.yeikos.com/url.js"></script>
 
 			<script type="text/javascript">
 

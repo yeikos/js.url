@@ -1,5 +1,5 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.5
+ * @name JavaScript/NodeJS URL v1.2.6
  * @author yeikos
  * @repository https://github.com/yeikos/js.url
 
