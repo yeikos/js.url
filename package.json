@@ -1,7 +1,7 @@
 {
 	
 	"name": "kurl",
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"author": "yeikos (http://www.yeikos.com)",
 	"description": "It's a powerfull URL parser written in JavaScript and compatible with NodeJS with a lot of features that it will help you to modify/parse easily a URL without any problem.",
 	"main": "url.js",

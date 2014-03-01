@@ -1,13 +1,13 @@
 /*!
- * @name JavaScript/NodeJS URL v1.2.6
+ * @name JavaScript/NodeJS URL v1.2.7
  * @author yeikos
  * @repository https://github.com/yeikos/js.url
 
- * Copyright 2013 yeikos - MIT license
+ * Copyright 2014 yeikos - MIT license
  * https://raw.github.com/yeikos/js.url/master/LICENSE
  */
 
-;(function(isNode, undefined) {
+;(function(isNode) {
 
 	var Public = function URL(url, location) {
 
@@ -79,7 +79,7 @@
 
 			} else if ((temp = typeof input) === 'string' || (input && temp === 'object')) {
 
-				// Deconstruimos la URL y guardamos su información en forma de objeto
+				// Desmontamos la URL y guardamos su información en forma de objeto
 
 				this._attributes = Public.unbuild(input, this.location);
 
@@ -327,7 +327,7 @@
 
 	Public.prototype.query = Public.prototype.search;
 
-	Public.version = '1.2.5';
+	Public.version = '1.2.7';
 
 	// Atributos válidos de la URL
 
@@ -807,15 +807,20 @@
 
 				empty = true,
 
-				index, subindex = 0, item, key;
+				index, subindex, item, key;
 
 			input = _object2array(input);
 
 			for (index in input) {
 
 				empty = false;
-
-				key = prefix ? (prefix + '[' + ((input instanceof Array) ? '' : encodeURIComponent(index)) + ']') : encodeURIComponent(index);
+				
+				// Si la matriz contiene un objeto se indicará el índice para
+				// que no se pierda la referencia de sus descendientes
+				
+				subindex = (input instanceof Array && !(typeof input[index] === 'object' && input[index])) ? '' : encodeURIComponent(index);
+				
+				key = prefix ? (prefix + '[' + subindex + ']') : encodeURIComponent(index);
 
 				result.push(
 
@@ -854,24 +859,12 @@
 	// Convierte una cadena de texto tipo `query` a objecto (a=1&b=2 -> {a: 1, b: 2})
 
 	Public.unparam = function(input) {
-
+		
 		// Descartamos entradas que no sean cadenas de texto
 
 		if (typeof input !== 'string')
 
 			return {};
-
-		// Decodificamos de forma segura
-
-		try {
-
-			input = decodeURI(input);
-
-		} catch(e) {
-
-			return {};
-
-		}
 
 		// Variables de itineración
 
@@ -886,10 +879,12 @@
 		// Números enteros que no empiecen por cero
 
 			expNumber = /^[0-9]d*/,
-
+					
 			isNumber = function(n) {
-
-				return !isNaN(parseFloat(n)) && isFinite(n);
+				
+				// Es un número válido, no empieza por 0X (ej: 02) y solo contiene números y puntuación
+				
+				return !isNaN(parseFloat(n)) && isFinite(n) && /^(?!0\d)/.test(n) && /^[\d\.]+$/.test(n);
 
 			},
 
@@ -918,11 +913,31 @@
 			if (!(item = input[index]))
 
 				continue;
-
+			
+			// 1+1+1=2+1 -> 1 1 1=2 1
+			
+			item = item.replace(expSpaces, ' ');
+			
 			// Obtenemos el nombre de la clave y su valor
-
-			key = (temp = item.split('=')).shift();
-			value = decodeURIComponent(temp.join('=').replace(expSpaces, ' '));
+			
+			try {
+				
+				key = decodeURIComponent((temp = item.split('=')).shift());
+				
+			} catch(e) {
+				
+				continue;
+				
+			}
+			
+			try {
+				
+				value = decodeURIComponent(temp.join('=').replace(expSpaces, ' '));
+				
+			} catch(e) {
+				
+				continue;
+			}
 
 			// El nombre de la clave no ha de empezar por [
 
@@ -933,7 +948,7 @@
 			// Obtenemos el nombre de la clave (reemplazamos los espacios)
 
 			subitems = key;
-			key = decodeURIComponent(temp[0].replace(expSpaces, ' '));
+			key = temp[0];
 
 			// Comprobamos si tiene anidaciones
 
@@ -960,6 +975,8 @@
 						item = subtemp = 0;
 
 						for (temp in link) {
+							
+							temp = Number(temp);
 
 							if (expNumber.test(temp) && temp >= item) {
 
@@ -1219,7 +1236,7 @@
 
 		for (index in input) {
 
-			if (subindex++ != index)
+			if (subindex++ !== Number(index))
 
 				return input;
 
