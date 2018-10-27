@@ -13,11 +13,6 @@ Demo online
 
 http://jsfiddle.net/yeikos/a2LdT/
 
-More info
---------------------------------------
-
-http://www.yeikos.com/2013/01/javascript-nodejs-url-parser.html
-
 Changelog
 --------------------------------------
 
@@ -78,7 +73,7 @@ Example
 
 		<head>
 
-			<script type="text/javascript" src="http://files.yeikos.com/url.js"></script>
+			<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/yeikos/js.url/url.js"></script>
 
 			<script type="text/javascript">
 
